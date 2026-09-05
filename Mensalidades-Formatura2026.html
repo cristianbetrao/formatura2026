@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão Financeira - Formatura AFV 2026</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- html2pdf.js for PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <style>
+        /* Custom scrollbars for large table */
+        .table-container::-webkit-scrollbar {
+            height: 8px;
+            width: 8px;
+        }
+        .table-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        .table-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+        }
+        /* Printable Report Minimalist Formatting */
+        .pdf-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+        }
+        .pdf-table th {
+            background-color: #f1f5f9;
+            color: #1e293b;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 6px 8px;
+            border-bottom: 2px solid #cbd5e1;
+        }
+        .pdf-table td {
+            padding: 5px 8px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #334155;
+        }
+        .pdf-table tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
+
+    <!-- Header Principal -->
+    <header class="bg-indigo-900 text-white shadow-md no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <!-- Ícone / Logo de Chapéu de Formatura -->
+                <div class="bg-indigo-800/80 p-2.5 rounded-xl shadow-inner flex items-center justify-center border border-indigo-700/50">
+                    <i class="fa-solid fa-graduation-cap text-3xl text-indigo-200"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-extrabold tracking-tight flex items-center gap-2">
+                        Formatura AFV 2026
+                        <span class="text-[10px] bg-indigo-700 text-indigo-100 font-semibold px-2 py-0.5 rounded-full uppercase">Fluxo de Caixa</span>
+                    </h1>
+                    <p class="text-xs text-indigo-200">Gestão de Parcelas (Março a Dezembro • 10x R$40)</p>
+                </div>
+            </div>
+            
+            <!-- Menu de Ações Recolhível Organizado -->
+            <div class="relative inline-block text-left">
+                <button id="btnMenuAcoes" onclick="toggleMenuAcoes()" class="bg-indigo-800 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center shadow-md transition border border-indigo-700">
+                    <i class="fa-solid fa-bars-staggered mr-2 text-indigo-300"></i>
+                    <span>Menu de Opções</span>
+                    <i class="fa-solid fa-chevron-down ml-2 text-xs text-indigo-300 transition-transform" id="setaMenuAcoes"></i>
+                </button>
+
+                <!-- Dropdown de Opções Reorganizado -->
+                <div id="dropdownAcoes" class="hidden absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-2xl py-2 z-50 text-slate-800 border border-slate-200 divide-y divide-slate-100 transform transition-all">
+                    <!-- Bloco 1: Ações Principais / Salvamento -->
+                    <div class="py-1">
+                        <button onclick="salvarDadosComAlerta(); fecharMenuAcoes();" class="w-full text-left px-4 py-2.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-50 flex items-center">
+                            <i class="fa-solid fa-floppy-disk w-6 text-emerald-600 text-sm"></i> Salvar Alterações
+                        </button>
+                    </div>
+                    <!-- Bloco 2: Importação e Backup -->
+                    <div class="py-1">
+                        <div class="px-4 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Backups e Arquivos</div>
+                        <button onclick="exportarJSON(); fecharMenuAcoes();" class="w-full text-left px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 flex items-center">
+                            <i class="fa-solid fa-download w-6 text-indigo-600 text-sm"></i> Exportar Backup (.JSON)
+                        </button>
+                        <label class="w-full text-left px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 flex items-center cursor-pointer">
+                            <i class="fa-solid fa-file-code w-6 text-indigo-600 text-sm"></i> Importar Backup (.JSON)
+                            <input type="file" id="importJsonFileInput" accept=".json" class="hidden" onchange="importarArquivoJSON(event); fecharMenuAcoes();">
+                        </label>
+                        <button onclick="baixarModeloCSV(); fecharMenuAcoes();" class="w-full text-left px-4 py-2 text-xs font-semibold text-amber-700 hover:bg-amber-50 flex items-center">
+                            <i class="fa-solid fa-file-arrow-down w-6 text-amber-600 text-sm"></i> Baixar Modelo (.CSV)
+                        </button>
+                        <label class="w-full text-left px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 flex items-center cursor-pointer">
+                            <i class="fa-solid fa-file-csv w-6 text-teal-600 text-sm"></i> Importar Planilha (.CSV)
+                            <input type="file" id="importCsvFileInput" accept=".csv" class="hidden" onchange="importarArquivoCSV(event); fecharMenuAcoes();">
+                        </label>
+                    </div>
+                    <!-- Bloco 3: Relatórios e Exportação Externa -->
+                    <div class="py-1">
+                        <div class="px-4 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Relatórios</div>
+                        <button onclick="exportarCSV(); fecharMenuAcoes();" class="w-full text-left px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 flex items-center">
+                            <i class="fa-solid fa-file-excel w-6 text-teal-600 text-sm"></i> Exportar para Excel (.CSV)
+                        </button>
+                        <button onclick="gerarPDF(); fecharMenuAcoes();" class="w-full text-left px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 flex items-center">
+                            <i class="fa-solid fa-file-pdf w-6 text-rose-600 text-sm"></i> Baixar Relatório PDF (Retrato)
+                        </button>
+                    </div>
+                    <!-- Bloco 4: Zona de Perigo / Manutenção -->
+                    <div class="py-1">
+                        <button onclick="confirmarLimpezaLocalStorage(); fecharMenuAcoes();" class="w-full text-left px-4 py-2.5 text-xs font-semibold text-rose-700 hover:bg-rose-50 flex items-center">
+                            <i class="fa-solid fa-trash-can w-6 text-rose-600 text-sm"></i> Limpar Dados do Navegador
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- Banner de Alerta do LocalStorage -->
+        <div id="bannerAlertaStorage" class="hidden bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl shadow-sm no-print">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <i class="fa-solid fa-triangle-exclamation text-amber-600 text-xl mr-3"></i>
+                    <div>
+                        <h4 class="text-xs font-extrabold uppercase text-amber-800">Aviso do Armazenamento Local</h4>
+                        <p class="text-xs text-amber-700 mt-0.5" id="textoAlertaStorage">Seu navegador está acumulando muitos dados. Recomendamos exportar um backup .JSON e limpar o cache do sistema.</p>
+                    </div>
+                </div>
+                <button onclick="exportarJSON()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs transition shadow-xs">
+                    Fazer Backup Agora
+                </button>
+            </div>
+        </div>
+
+        <!-- Informações do Líder e Turma (Recolhível) -->
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden no-print">
+            <div class="bg-slate-100/70 px-5 py-3 flex justify-between items-center border-b border-slate-200 cursor-pointer select-none" onclick="togglePainelInfo()">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-id-card text-indigo-700 text-sm"></i>
+                    <h2 class="text-xs font-bold uppercase tracking-wider text-slate-700">Informações da Turma e Comissão</h2>
+                </div>
+                <button id="btnToggleInfo" class="text-slate-500 hover:text-slate-700 text-xs font-semibold flex items-center gap-1 transition">
+                    <span id="labelToggleInfo">Ocultar Painel</span>
+                    <i class="fa-solid fa-chevron-up text-xs transition-transform" id="setaToggleInfo"></i>
+                </button>
+            </div>
+
+            <div id="conteudoPainelInfo" class="p-5 transition-all">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Nome da Turma / Curso</label>
+                        <input type="text" id="infoTurma" placeholder="Ex: 3º Ano Matutino - AFV" oninput="salvarCabecalho()" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-semibold text-slate-800">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Nome do Líder Responsável</label>
+                        <input type="text" id="infoLider" placeholder="Ex: João Silva" oninput="salvarCabecalho()" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-semibold text-slate-800">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Contato do Líder de Turma</label>
+                        <input type="text" id="infoContatoLider" placeholder="Ex: 79 999999999" oninput="tratarEGuardarContatoLider(this)" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-semibold text-slate-800">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-indigo-700 mb-1">
+                            <i class="fa-solid fa-calendar-day mr-1"></i> Mês de Referência
+                        </label>
+                        <select id="selectMesVigente" onchange="alterarMesVigente(this.value)" class="w-full px-3 py-2 border border-indigo-200 bg-indigo-50/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-bold text-indigo-900">
+                            <option value="3">Março (Parcela 1)</option>
+                            <option value="4">Abril (Parcela 2)</option>
+                            <option value="5">Maio (Parcela 3)</option>
+                            <option value="6">Junho (Parcela 4)</option>
+                            <option value="7">Julho (Parcela 5)</option>
+                            <option value="8">Agosto (Parcela 6)</option>
+                            <option value="9">Setembro (Parcela 7)</option>
+                            <option value="10">Outubro (Parcela 8)</option>
+                            <option value="11">Novembro (Parcela 9)</option>
+                            <option value="12">Dezembro (Parcela 10)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cards de Resumo Financeiro -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Arrecadado Turma</p>
+                    <h3 class="text-2xl font-extrabold text-emerald-600 mt-1" id="statArrecadado">R$ 0,00</h3>
+                    <p class="text-xs text-slate-400 mt-0.5" id="statMetaMeta">Meta: R$ 0,00</p>
+                </div>
+                <div class="p-3 bg-emerald-50 rounded-lg text-emerald-600">
+                    <i class="fa-solid fa-wallet text-2xl"></i>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Pendente Turma</p>
+                    <h3 class="text-2xl font-extrabold text-amber-600 mt-1" id="statPendente">R$ 0,00</h3>
+                    <p class="text-xs text-slate-400 mt-0.5" id="statProgressoPrc">0% Concluído</p>
+                </div>
+                <div class="p-3 bg-amber-50 rounded-lg text-amber-600">
+                    <i class="fa-solid fa-clock text-2xl"></i>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Recebido em PIX</p>
+                    <h3 class="text-2xl font-extrabold text-indigo-600 mt-1" id="statPix">R$ 0,00</h3>
+                    <p class="text-xs text-slate-400 mt-0.5" id="statPixQtd">0 parcelas</p>
+                </div>
+                <div class="p-3 bg-indigo-50 rounded-lg text-indigo-600">
+                    <i class="fa-solid fa-qrcode text-2xl"></i>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Recebido em Espécie</p>
+                    <h3 class="text-2xl font-extrabold text-teal-600 mt-1" id="statEspecie">R$ 0,00</h3>
+                    <p class="text-xs text-slate-400 mt-0.5" id="statEspecieQtd">0 parcelas</p>
+                </div>
+                <div class="p-3 bg-teal-50 rounded-lg text-teal-600">
+                    <i class="fa-solid fa-money-bill-wave text-2xl"></i>
+                </div>
+            </div>
+        </section>
+
+        <!-- Barra de Ações Rápidas & Busca -->
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4 no-print">
+            <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                <button onclick="abrirModalEstudante()" class="flex-1 md:flex-none bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2.5 rounded-lg text-sm flex items-center justify-center transition shadow-sm">
+                    <i class="fa-solid fa-user-plus mr-2"></i> Cadastrar Estudante +
+                </button>
+                <button onclick="abrirModalLote()" class="flex-1 md:flex-none bg-teal-600 hover:bg-teal-700 text-white font-semibold px-4 py-2.5 rounded-lg text-sm flex items-center justify-center transition shadow-sm">
+                    <i class="fa-solid fa-users text-sm mr-2"></i> Cadastrar em Lote ++
+                </button>
+            </div>
+
+            <div class="relative w-full md:w-72">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                <input type="text" id="inputBusca" placeholder="Buscar estudante..." onkeyup="filtrarEstudantes()" class="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+        </div>
+
+        <!-- Tabela Principal na Tela Interativa -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden no-print">
+            <div class="table-container overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs min-w-[1200px]">
+                    <thead>
+                        <tr class="bg-slate-100 border-b border-slate-200 text-slate-700 font-semibold uppercase tracking-wider">
+                            <th class="p-3 text-center w-12 min-w-[48px] max-w-[48px] sticky left-0 bg-slate-100 z-30 shadow-sm border-r border-slate-200">#</th>
+                            <th class="p-3 min-w-[220px] sticky left-[48px] bg-slate-100 z-30 shadow-md border-r border-slate-300">Formando</th>
+                            <!-- Colunas 1 até 10 -->
+                            <template id="thParcelasTemplate">
+                                <!-- Gerado dinamicamente via JS -->
+                            </template>
+                            <th class="p-3 text-center min-w-[100px] bg-slate-200">Total Pago</th>
+                            <th class="p-3 text-center min-w-[100px] bg-slate-100">Status</th>
+                            <th class="p-3 text-center min-w-[120px]">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaCorpo" class="divide-y divide-slate-200">
+                        <!-- Linhas geradas via JavaScript -->
+                    </tbody>
+                    <tfoot>
+                        <tr class="bg-slate-800 text-white font-bold">
+                            <td class="p-3 text-center sticky left-0 bg-slate-800 z-30 shadow-md border-r border-slate-700" colspan="2">TOTAL GERAL DA TURMA</td>
+                            <td id="footP1" class="p-2 text-center">R$ 0</td>
+                            <td id="footP2" class="p-2 text-center">R$ 0</td>
+                            <td id="footP3" class="p-2 text-center">R$ 0</td>
+                            <td id="footP4" class="p-2 text-center">R$ 0</td>
+                            <td id="footP5" class="p-2 text-center">R$ 0</td>
+                            <td id="footP6" class="p-2 text-center">R$ 0</td>
+                            <td id="footP7" class="p-2 text-center">R$ 0</td>
+                            <td id="footP8" class="p-2 text-center">R$ 0</td>
+                            <td id="footP9" class="p-2 text-center">R$ 0</td>
+                            <td id="footP10" class="p-2 text-center">R$ 0</td>
+                            <td id="footTotalGeral" class="p-3 text-center bg-emerald-700 text-white font-black text-sm">R$ 0,00</td>
+                            <td class="p-3 text-center" colspan="2">
+                                <span id="footEstudantesQtd" class="text-xs font-normal opacity-80">0 Formandos</span>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <!-- Estado Vazio -->
+            <div id="estadoVazio" class="py-12 text-center text-slate-400 hidden">
+                <i class="fa-solid fa-users-slash text-4xl mb-3 text-slate-300"></i>
+                <p class="text-base font-medium">Nenhum formando cadastrado ainda.</p>
+                <p class="text-xs mt-1">Clique em "Cadastrar Estudante +" ou "Cadastrar em Lote ++" para começar.</p>
+            </div>
+        </div>
+
+        <!-- TEMPLATE EXCLUSIVO PARA O RELATÓRIO PDF (MODO RETRATO) -->
+        <div id="areaRelatorioPDF" class="hidden">
+            <div class="bg-white p-6 max-w-[210mm] mx-auto text-slate-900 font-sans border border-slate-200 shadow-sm">
+                
+                <!-- Cabeçalho do Relatório com Logo de Chapéu de Formatura -->
+                <div class="flex items-center justify-between pb-4 border-b-2 border-indigo-900 mb-4">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 rounded-xl bg-indigo-900 flex items-center justify-center text-white flex-shrink-0">
+                            <i class="fa-solid fa-graduation-cap text-2xl"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-black text-indigo-950 uppercase tracking-tight">Formatura AFV 2026</h1>
+                            <p class="text-xs font-bold text-slate-600">Colégio Estadual Pref. Anfilófio Fernandes Viana</p>
+                            <p class="text-[10px] text-slate-500">Relatório Financeiro de Pagamento de Mensalidades</p>
+                        </div>
+                    </div>
+
+                    <div class="text-right">
+                        <span class="inline-block bg-indigo-100 text-indigo-900 font-extrabold px-2.5 py-1 rounded text-[10px] uppercase">Comissão de Formatura</span>
+                        <p class="text-[10px] text-slate-500 mt-1" id="pdfDataGeracao">Gerado em: -</p>
+                    </div>
+                </div>
+
+                <!-- Meta Informações em Grid Organizada -->
+                <div class="grid grid-cols-3 gap-3 bg-slate-50 p-3 rounded-lg border border-slate-200 mb-4 text-xs">
+                    <div>
+                        <span class="block text-[9px] font-bold text-slate-400 uppercase">Turma / Curso</span>
+                        <strong class="text-slate-800 font-bold" id="pdfTurmaInfo">-</strong>
+                    </div>
+                    <div>
+                        <span class="block text-[9px] font-bold text-slate-400 uppercase">Líder Responsável</span>
+                        <strong class="text-slate-800 font-bold" id="pdfLiderInfo">-</strong>
+                    </div>
+                    <div>
+                        <span class="block text-[9px] font-bold text-slate-400 uppercase">Contato do Líder</span>
+                        <strong class="text-slate-800 font-bold" id="pdfContatoLiderInfo">-</strong>
+                    </div>
+                </div>
+
+                <!-- Resumo dos Valores -->
+                <div class="grid grid-cols-4 gap-2 text-center mb-5">
+                    <div class="p-2 bg-emerald-50 border border-emerald-200 rounded">
+                        <span class="block text-[9px] font-bold text-emerald-800 uppercase">Total Arrecadado</span>
+                        <strong class="text-sm font-extrabold text-emerald-700" id="pdfTotalArrecadado">R$ 0,00</strong>
+                    </div>
+                    <div class="p-2 bg-amber-50 border border-amber-200 rounded">
+                        <span class="block text-[9px] font-bold text-amber-800 uppercase">Total Pendente</span>
+                        <strong class="text-sm font-extrabold text-amber-700" id="pdfTotalPendente">R$ 0,00</strong>
+                    </div>
+                    <div class="p-2 bg-indigo-50 border border-indigo-200 rounded">
+                        <span class="block text-[9px] font-bold text-indigo-800 uppercase">Total em PIX</span>
+                        <strong class="text-sm font-extrabold text-indigo-700" id="pdfTotalPix">R$ 0,00</strong>
+                    </div>
+                    <div class="p-2 bg-teal-50 border border-teal-200 rounded">
+                        <span class="block text-[9px] font-bold text-teal-800 uppercase">Total em Espécie</span>
+                        <strong class="text-sm font-extrabold text-teal-700" id="pdfTotalEspecie">R$ 0,00</strong>
+                    </div>
+                </div>
+
+                <!-- Tabela Minimalista para Modo Retrato -->
+                <div class="mb-4">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 mb-2 border-b pb-1">Detalhamento por Formando</h3>
+                    <table class="pdf-table">
+                        <thead>
+                            <tr>
+                                <th class="text-center w-8">#</th>
+                                <th>Nome do Formando</th>
+                                <th class="text-center">Parcelas Quitadas</th>
+                                <th class="text-right">Total Pago</th>
+                                <th class="text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pdfTabelaCorpo">
+                            <!-- Preenchido dinamicamente no JS -->
+                        </tbody>
+                        <tfoot>
+                            <tr class="bg-slate-800 text-white font-bold">
+                                <td colspan="3" class="p-2 text-right uppercase text-[10px]">Total Geral Arrecadado:</td>
+                                <td id="pdfFootTotalGeral" class="p-2 text-right text-emerald-300 font-extrabold text-xs">R$ 0,00</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <!-- Rodapé Oficial do PDF -->
+                <div class="pt-4 border-t border-slate-200 flex justify-between items-center text-[9px] text-slate-400">
+                    <p>Formatura AFV 2026 • Documento Gerado pelo Gestor Financeiro de Formatura</p>
+                    <p>Página 1 de 1</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal Adicionar / Editar Estudante Individual -->
+    <div id="modalEstudante" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full overflow-hidden transform transition-all">
+            <div class="bg-indigo-900 text-white px-6 py-4 flex justify-between items-center">
+                <h3 class="font-bold text-lg" id="modalTitulo">Cadastrar Formando</h3>
+                <button onclick="fecharModalEstudante()" class="text-indigo-200 hover:text-white transition">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            <form id="formEstudante" onsubmit="salvarEstudante(event)" class="p-6 space-y-4">
+                <input type="hidden" id="estudanteId">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nome Completo do Formando *</label>
+                    <input type="text" id="estudanteNome" required placeholder="Ex: Maria Eduarda Santos" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Telefone / WhatsApp (Opcional)</label>
+                    <input type="text" id="estudanteTelefone" placeholder="(00) 90000-0000" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Observações / Anotações</label>
+                    <textarea id="estudanteObs" rows="2" placeholder="Ex: Preferência por pagamentos via Pix" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"></textarea>
+                </div>
+                
+                <div class="pt-2 flex justify-end space-x-2">
+                    <button type="button" onclick="fecharModalEstudante()" class="px-4 py-2 border border-slate-300 text-slate-700 hover:bg-slate-50 rounded-lg text-sm font-medium transition">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition flex items-center">
+                        <i class="fa-solid fa-check mr-2"></i> Salvar Formando
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Cadastrar Formandos em Lote -->
+    <div id="modalLote" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-xl shadow-xl max-w-lg w-full overflow-hidden transform transition-all">
+            <div class="bg-teal-700 text-white px-6 py-4 flex justify-between items-center">
+                <h3 class="font-bold text-lg flex items-center gap-2">
+                    <i class="fa-solid fa-users"></i> Cadastrar Formandos em Lote
+                </h3>
+                <button onclick="fecharModalLote()" class="text-teal-200 hover:text-white transition">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            <form onsubmit="salvarLoteEstudantes(event)" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Lista de Nomes (Um por linha)</label>
+                    <p class="text-[11px] text-slate-500 mb-2">Cole aqui a lista da chamada ou de contatos. Nomes repetidos ou linhas em branco serão ignorados automaticamente.</p>
+                    <textarea id="inputListaLote" rows="8" placeholder="Ana Clara Santos&#10;Bruno Oliveira&#10;Carlos Eduardo Silva" class="w-full p-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm font-mono leading-relaxed" required></textarea>
+                </div>
+                
+                <div class="pt-2 flex justify-end space-x-2">
+                    <button type="button" onclick="fecharModalLote()" class="px-4 py-2 border border-slate-300 text-slate-700 hover:bg-slate-50 rounded-lg text-sm font-medium transition">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-medium transition flex items-center">
+                        <i class="fa-solid fa-user-plus mr-2"></i> Adicionar Todos à Turma
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Detalhes/Edição Rápida da Parcela -->
+    <div id="modalParcela" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-xl shadow-xl max-w-xs w-full overflow-hidden transform transition-all">
+            <div class="bg-slate-800 text-white px-5 py-3 flex justify-between items-center">
+                <h3 class="font-bold text-sm" id="modalParcelaTitulo">Editar Parcela</h3>
+                <button onclick="fecharModalParcela()" class="text-slate-300 hover:text-white transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div class="p-5 space-y-4">
+                <p class="text-xs text-slate-500 font-medium" id="modalParcelaSubtitulo">Estudante: -</p>
+                
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Valor Pago (R$)</label>
+                    <input type="text" id="inputValorParcela" inputmode="decimal" placeholder="0.00" oninput="validarApenasNumero(this)" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-base font-bold text-slate-800">
+                    <div class="flex gap-1 mt-1.5">
+                        <button type="button" onclick="setValorRapido(0)" class="text-[10px] bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded border text-slate-600 font-medium">R$ 0</button>
+                        <button type="button" onclick="setValorRapido(20)" class="text-[10px] bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded border text-slate-600 font-medium">R$ 20</button>
+                        <button type="button" onclick="setValorRapido(40)" class="text-[10px] bg-emerald-100 hover:bg-emerald-200 px-2 py-1 rounded border text-emerald-800 font-bold">R$ 40 (Total)</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Meio de Pagamento</label>
+                    <select id="selectMeioPagamento" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm bg-white font-medium text-slate-700">
+                        <option value="PIX">PIX</option>
+                        <option value="Espécie">Espécie (Dinheiro)</option>
+                        <option value="Ambos">Ambos (Pix + Espécie)</option>
+                    </select>
+                </div>
+
+                <div class="pt-2 flex justify-end space-x-2">
+                    <button type="button" onclick="fecharModalParcela()" class="px-3 py-1.5 border border-slate-300 text-slate-700 hover:bg-slate-50 rounded-lg text-xs font-medium">Cancelar</button>
+                    <button type="button" onclick="salvarAlteracaoParcela()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-medium">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast de Notificação -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl flex items-center space-x-3 text-sm z-50 transform translate-y-20 opacity-0 transition-all duration-300">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+        <span id="toastMensagem">Operação realizada com sucesso!</span>
+    </div>
+
+    <!-- Rodapé -->
+    <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500 no-print">
+        <p>Formatura AFV 2026 • Sistema de Controle Financeiro • Valor Parcela: R$ 40,00 (10x = R$ 400,00)</p>
+    </footer>
+
+    <!-- LÓGICA DO SISTEMA -->
+    <script>
+        // Configuração das parcelas
+        const VALOR_PARCELA = 40;
+        const QTD_PARCELAS = 10;
+        const VALOR_TOTAL_FORMANDO = VALOR_PARCELA * QTD_PARCELAS; // R$ 400
+        const MES_INICIO = 3; // Março = P1
+
+        // Função para ordenar os formandos em ordem alfabética crescente (A-Z)
+        function ordenarFormandos() {
+            if (estado && estado.estudantes) {
+                estado.estudantes.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' }));
+            }
+        }
+
+        // Função para calcular dinamicamente o mês atual real do computador
+        function obterMesAtualAutomatico() {
+            const mesAtualReal = new Date().getMonth() + 1;
+            if (mesAtualReal < 3) return 3;  // Se estiver em Jan/Fev, ajusta para o início do plano (Março)
+            if (mesAtualReal > 12) return 12; // Se passar de Dezembro, fixa em Dezembro
+            return mesAtualReal;
+        }
+
+        // Função para remover caracteres especiais mantendo apenas letras, números e espaços (usada em outros campos)
+        function limparCaracteresEspeciais(str) {
+            return str ? str.replace(/[^a-zA-Z0-9\s]/g, '') : '';
+        }
+
+        // Estado da Aplicação
+        let estado = {
+            cabecalho: {
+                turma: 'Formatura AFV 2026',
+                lider: '',
+                contatoLider: '',
+                mesVigente: obterMesAtualAutomatico(),
+                painelRecolhido: false
+            },
+            estudantes: []
+        };
+
+        let parcelaEmEdicao = {
+            estudanteId: null,
+            numParcela: null
+        };
+
+        // Trata o input de contato em tempo real sem caracteres especiais
+        function tratarEGuardarContatoLider(input) {
+            input.value = limparCaracteresEspeciais(input.value);
+            salvarCabecalho();
+        }
+
+        // Alternar visualização do painel recolhível
+        function togglePainelInfo() {
+            const conteudo = document.getElementById('conteudoPainelInfo');
+            const seta = document.getElementById('setaToggleInfo');
+            const label = document.getElementById('labelToggleInfo');
+
+            estado.cabecalho.painelRecolhido = !estado.cabecalho.painelRecolhido;
+
+            if (estado.cabecalho.painelRecolhido) {
+                conteudo.classList.add('hidden');
+                seta.classList.add('rotate-180');
+                label.innerText = 'Mostrar Painel';
+            } else {
+                conteudo.classList.remove('hidden');
+                seta.classList.remove('rotate-180');
+                label.innerText = 'Ocultar Painel';
+            }
+            salvarLocalStorage();
+        }
+
+        // Alternar detalhes recolhidos do formando ao clicar no nome
+        function toggleDetalhesEstudante(id) {
+            const linhaDetalhes = document.getElementById(`detalhes_${id}`);
+            const seta = document.getElementById(`seta_${id}`);
+            if (linhaDetalhes) {
+                linhaDetalhes.classList.toggle('hidden');
+            }
+            if (seta) {
+                seta.classList.toggle('rotate-180');
+            }
+        }
+
+        // Alternar status ativo/inativo do formando
+        function toggleStatusAtivoEstudante(id) {
+            const est = estado.estudantes.find(e => e.id === id);
+            if (!est) return;
+
+            est.ativo = !(est.ativo !== false);
+            salvarLocalStorage();
+            renderizar();
+            mostrarToast(est.ativo ? `${est.nome} foi ativado(a)!` : `${est.nome} foi inativado(a)!`);
+        }
+
+        // Toggle do Menu de Ações
+        function toggleMenuAcoes() {
+            const dropdown = document.getElementById('dropdownAcoes');
+            const seta = document.getElementById('setaMenuAcoes');
+            dropdown.classList.toggle('hidden');
+            if (seta) seta.classList.toggle('rotate-180');
+        }
+
+        function fecharMenuAcoes() {
+            const dropdown = document.getElementById('dropdownAcoes');
+            const seta = document.getElementById('setaMenuAcoes');
+            if (dropdown) dropdown.classList.add('hidden');
+            if (seta) seta.classList.remove('rotate-180');
+        }
+
+        // Fechar dropdown ao clicar fora
+        window.addEventListener('click', function(e) {
+            const btn = document.getElementById('btnMenuAcoes');
+            const dropdown = document.getElementById('dropdownAcoes');
+            if (btn && dropdown && !btn.contains(e.target) && !dropdown.contains(e.target)) {
+                fecharMenuAcoes();
+            }
+        });
+
+        // Inicialização
+        window.addEventListener('DOMContentLoaded', () => {
+            renderizarCabecalhoTabela();
+            carregarDadosSalvos();
+            document.getElementById('selectMesVigente').value = estado.cabecalho.mesVigente;
+            verificarUsoLocalStorage();
+            renderizar();
+        });
+
+        function alterarMesVigente(val) {
+            estado.cabecalho.mesVigente = parseInt(val) || obterMesAtualAutomatico();
+            salvarLocalStorage();
+            renderizar();
+            mostrarToast('Mês de referência atualizado!');
+        }
+
+        // Calcula status do formando (Incluindo o status "Quitado")
+        function calcularStatusEstudante(estudante) {
+            if (estudante.ativo === false) {
+                return { texto: 'Inativo', cor: 'bg-slate-200 text-slate-600 border-slate-300', icone: 'fa-user-slash' };
+            }
+
+            const mesAtual = estado.cabecalho.mesVigente || obterMesAtualAutomatico();
+            
+            let parcelasEsperadas = 0;
+            if (mesAtual >= MES_INICIO && mesAtual <= 12) {
+                parcelasEsperadas = (mesAtual - MES_INICIO) + 1;
+            } else if (mesAtual > 12) {
+                parcelasEsperadas = 10;
+            }
+
+            let ultimaPaga = 0;
+            let totalPago = 0;
+
+            for (let p = 1; p <= QTD_PARCELAS; p++) {
+                const dadosP = estudante.parcelas[p] || { valor: 0 };
+                const v = parseFloat(dadosP.valor) || 0;
+                totalPago += v;
+                if (v >= VALOR_PARCELA) {
+                    ultimaPaga = p;
+                }
+            }
+
+            const parcelasCobertasPeloTotal = Math.floor(totalPago / VALOR_PARCELA);
+            const nivelPagamento = Math.max(ultimaPaga, parcelasCobertasPeloTotal);
+
+            // Verifica se pagou todas as parcelas (Quitado)
+            if (totalPago >= VALOR_TOTAL_FORMANDO || parcelasCobertasPeloTotal >= QTD_PARCELAS) {
+                return { texto: 'Quitado', cor: 'bg-emerald-600 text-white border-emerald-700 shadow-sm', icone: 'fa-certificate' };
+            }
+
+            if (nivelPagamento < parcelasEsperadas) {
+                return { texto: 'Atrasado(a)', cor: 'bg-rose-100 text-rose-800 border-rose-300', icone: 'fa-circle-exclamation' };
+            } else if (nivelPagamento === parcelasEsperadas) {
+                return { texto: 'Em dia', cor: 'bg-emerald-100 text-emerald-800 border-emerald-300', icone: 'fa-circle-check' };
+            } else {
+                return { texto: 'Adiantado(a)', cor: 'bg-purple-100 text-purple-800 border-purple-300', icone: 'fa-forward' };
+            }
+        }
+
+        function renderizarCabecalhoTabela() {
+            const template = document.getElementById('thParcelasTemplate');
+            let html = '';
+            const nomesMeses = ['Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+            for (let i = 1; i <= QTD_PARCELAS; i++) {
+                html += `
+                    <th class="p-2 text-center min-w-[85px]">
+                        <span class="block font-bold">P${i} (${nomesMeses[i-1]})</span>
+                        <span class="text-[9px] text-slate-400 font-normal">R$40</span>
+                    </th>
+                `;
+            }
+            template.outerHTML = html;
+        }
+
+        function renderizar() {
+            ordenarFormandos();
+            const tbody = document.getElementById('tabelaCorpo');
+            const estadoVazio = document.getElementById('estadoVazio');
+            const busca = document.getElementById('inputBusca').value.toLowerCase();
+
+            tbody.innerHTML = '';
+
+            const estudantesFiltrados = estado.estudantes.filter(est => 
+                est.nome.toLowerCase().includes(busca)
+            );
+
+            if (estudantesFiltrados.length === 0) {
+                estadoVazio.classList.remove('hidden');
+            } else {
+                estadoVazio.classList.add('hidden');
+            }
+
+            let somaP = Array(QTD_PARCELAS).fill(0);
+            let totalGeralArrecadado = 0;
+            let totalPix = 0;
+            let totalEspecie = 0;
+            let qtdPix = 0;
+            let qtdEspecie = 0;
+
+            estudantesFiltrados.forEach((est, index) => {
+                const eAtivo = est.ativo !== false;
+                const tr = document.createElement('tr');
+                tr.className = `hover:bg-slate-50/80 transition text-slate-700 ${!eAtivo ? 'opacity-50 grayscale bg-slate-50' : ''}`;
+
+                let totalPagoEstudante = 0;
+                let parcelasHTML = '';
+
+                for (let p = 1; p <= QTD_PARCELAS; p++) {
+                    const dadosP = est.parcelas[p] || { valor: 0, meio: 'Pendente' };
+                    const valorNum = parseFloat(dadosP.valor) || 0;
+                    
+                    totalPagoEstudante += valorNum;
+                    somaP[p - 1] += valorNum;
+
+                    if (valorNum > 0) {
+                        if (dadosP.meio === 'PIX') {
+                            totalPix += valorNum;
+                            qtdPix++;
+                        } else if (dadosP.meio === 'Espécie') {
+                            totalEspecie += valorNum;
+                            qtdEspecie++;
+                        } else if (dadosP.meio === 'Ambos') {
+                            totalPix += valorNum / 2;
+                            totalEspecie += valorNum / 2;
+                            qtdPix++;
+                            qtdEspecie++;
+                        }
+                    }
+
+                    let badgeColor = 'bg-slate-100 text-slate-500 border-slate-200';
+                    let valorClass = 'text-slate-400';
+
+                    if (valorNum >= 40) {
+                        badgeColor = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+                        valorClass = 'text-emerald-700 font-bold';
+                    } else if (valorNum > 0) {
+                        badgeColor = 'bg-amber-50 text-amber-700 border-amber-200';
+                        valorClass = 'text-amber-700 font-semibold';
+                    }
+
+                    let meioBadge = '';
+                    if (valorNum > 0) {
+                        if (dadosP.meio === 'PIX') meioBadge = `<span class="text-[9px] bg-indigo-100 text-indigo-700 px-1 rounded">PIX</span>`;
+                        else if (dadosP.meio === 'Espécie') meioBadge = `<span class="text-[9px] bg-teal-100 text-teal-700 px-1 rounded">ESP</span>`;
+                        else if (dadosP.meio === 'Ambos') meioBadge = `<span class="text-[9px] bg-purple-100 text-purple-700 px-1 rounded">AMB</span>`;
+                    }
+
+                    parcelasHTML += `
+                        <td class="p-1.5 text-center cursor-pointer hover:bg-indigo-50/50 transition border-r border-slate-100" onclick="abrirModalParcela('${est.id}', ${p})">
+                            <div class="flex flex-col items-center justify-center min-h-[38px] p-1 rounded border ${badgeColor}">
+                                <span class="${valorClass}">R$ ${valorNum.toFixed(0)}</span>
+                                ${meioBadge}
+                            </div>
+                        </td>
+                    `;
+                }
+
+                totalGeralArrecadado += totalPagoEstudante;
+
+                const stInfo = calcularStatusEstudante(est);
+                const statusBadge = `
+                    <span class="inline-flex items-center gap-1 ${stInfo.cor} border text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase shadow-xs">
+                        <i class="fa-solid ${stInfo.icone}"></i> ${stInfo.texto}
+                    </span>
+                `;
+
+                const botaoStatusAtivo = eAtivo 
+                    ? `<button onclick="toggleStatusAtivoEstudante('${est.id}')" title="Inativar Formando (ocultar no PDF)" class="p-1.5 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded transition text-xs"><i class="fa-solid fa-eye-slash"></i></button>`
+                    : `<button onclick="toggleStatusAtivoEstudante('${est.id}')" title="Ativar Formando (exibir no PDF)" class="p-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded transition text-xs"><i class="fa-solid fa-eye"></i></button>`;
+
+                tr.innerHTML = `
+                    <td class="p-3 text-center text-slate-400 font-medium w-12 min-w-[48px] max-w-[48px] sticky left-0 bg-white z-20 shadow-sm border-r border-slate-200">${index + 1}</td>
+                    <td class="p-3 font-semibold text-slate-800 sticky left-[48px] bg-white z-20 shadow-md border-r border-slate-300 cursor-pointer select-none hover:bg-indigo-50/50 transition" onclick="toggleDetalhesEstudante('${est.id}')">
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-indigo-950 font-bold hover:text-indigo-600 transition flex items-center gap-1.5">
+                                ${est.nome}
+                                ${!eAtivo ? '<span class="text-[9px] bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded font-normal">(Inativo)</span>' : ''}
+                            </span>
+                            <i class="fa-solid fa-chevron-down text-[10px] text-indigo-400 transition-transform" id="seta_${est.id}"></i>
+                        </div>
+                    </td>
+                    ${parcelasHTML}
+                    <td class="p-3 text-center font-bold text-slate-900 bg-slate-50 border-r">
+                        R$ ${totalPagoEstudante.toFixed(2)}
+                    </td>
+                    <td class="p-3 text-center whitespace-nowrap">
+                        ${statusBadge}
+                    </td>
+                    <td class="p-3 text-center no-print">
+                        <div class="flex justify-center items-center space-x-1">
+                            ${botaoStatusAtivo}
+                            <button onclick="quitarTotalmente('${est.id}')" title="Quitar todas as 10 parcelas" class="p-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 rounded transition text-xs">
+                                <i class="fa-solid fa-check-double"></i>
+                            </button>
+                            <button onclick="editarEstudante('${est.id}')" title="Editar Estudante" class="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded transition text-xs">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button onclick="removerEstudante('${est.id}')" title="Excluir Estudante" class="p-1.5 bg-rose-100 hover:bg-rose-200 text-rose-700 rounded transition text-xs">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+
+                tbody.appendChild(tr);
+
+                // Linha de Detalhes Recolhida (Expandível ao clicar no nome)
+                const trDetalhes = document.createElement('tr');
+                trDetalhes.id = `detalhes_${est.id}`;
+                trDetalhes.className = `hidden bg-indigo-50/40 border-b border-indigo-100 transition-all ${!eAtivo ? 'opacity-50 grayscale' : ''}`;
+
+                const telExibicao = est.telefone ? est.telefone : 'Não informado';
+                const obsExibicao = est.obs ? est.obs : 'Nenhuma observação registrada.';
+
+                trDetalhes.innerHTML = `
+                    <td colspan="15" class="p-3">
+                        <div class="flex flex-wrap items-center gap-6 text-xs text-slate-700 pl-4 border-l-4 border-indigo-500 my-1">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-brands fa-whatsapp text-emerald-600 text-base"></i>
+                                <span><strong class="font-bold text-slate-800">Telefone:</strong> ${telExibicao}</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-note-sticky text-amber-500 text-base"></i>
+                                <span><strong class="font-bold text-slate-800">Observação:</strong> ${obsExibicao}</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-user text-indigo-500 text-base"></i>
+                                <span><strong class="font-bold text-slate-800">Situação:</strong> ${eAtivo ? 'Ativo na Turma' : 'Inativado (Oculto no PDF)'}</span>
+                            </div>
+                        </div>
+                    </td>
+                `;
+
+                tbody.appendChild(trDetalhes);
+            });
+
+            for (let p = 1; p <= QTD_PARCELAS; p++) {
+                document.getElementById(`footP${p}`).innerText = `R$ ${somaP[p-1].toFixed(0)}`;
+            }
+            document.getElementById('footTotalGeral').innerText = `R$ ${totalGeralArrecadado.toFixed(2)}`;
+            document.getElementById('footEstudantesQtd').innerText = `${estado.estudantes.length} Formandos`;
+
+            const metaTurma = estado.estudantes.length * VALOR_TOTAL_FORMANDO;
+            const pendenteTurma = metaTurma - totalGeralArrecadado;
+            const pctConcluido = metaTurma > 0 ? ((totalGeralArrecadado / metaTurma) * 100).toFixed(1) : 0;
+
+            document.getElementById('statArrecadado').innerText = `R$ ${totalGeralArrecadado.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            document.getElementById('statMetaMeta').innerText = `Meta: R$ ${metaTurma.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+
+            document.getElementById('statPendente').innerText = `R$ ${pendenteTurma.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            document.getElementById('statProgressoPrc').innerText = `${pctConcluido}% Atingido`;
+
+            document.getElementById('statPix').innerText = `R$ ${totalPix.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            document.getElementById('statPixQtd').innerText = `${qtdPix} parcelas registradas`;
+
+            document.getElementById('statEspecie').innerText = `R$ ${totalEspecie.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            document.getElementById('statEspecieQtd').innerText = `${qtdEspecie} parcelas registradas`;
+
+            salvarLocalStorage();
+        }
+
+        function filtrarEstudantes() {
+            renderizar();
+        }
+
+        // --- GESTÃO DE ESTUDANTES (INDIVIDUAL & LOTE) ---
+
+        function abrirModalEstudante() {
+            document.getElementById('estudanteId').value = '';
+            document.getElementById('estudanteNome').value = '';
+            document.getElementById('estudanteTelefone').value = '';
+            document.getElementById('estudanteObs').value = '';
+            document.getElementById('modalTitulo').innerText = 'Cadastrar Formando';
+            document.getElementById('modalEstudante').classList.remove('hidden');
+        }
+
+        function fecharModalEstudante() {
+            document.getElementById('modalEstudante').classList.add('hidden');
+        }
+
+        function abrirModalLote() {
+            document.getElementById('inputListaLote').value = '';
+            document.getElementById('modalLote').classList.remove('hidden');
+        }
+
+        function fecharModalLote() {
+            document.getElementById('modalLote').classList.add('hidden');
+        }
+
+        // Criar objeto de parcelas zeradas padronizado
+        function criarParcelasIniciais() {
+            const parcelas = {};
+            for (let i = 1; i <= QTD_PARCELAS; i++) {
+                parcelas[i] = { valor: 0, meio: 'Pendente' };
+            }
+            return parcelas;
+        }
+
+        function salvarEstudante(e) {
+            e.preventDefault();
+            const id = document.getElementById('estudanteId').value;
+            const nome = document.getElementById('estudanteNome').value.trim();
+            const telefone = document.getElementById('estudanteTelefone').value.trim();
+            const obs = document.getElementById('estudanteObs').value.trim();
+
+            if (!nome) return;
+
+            if (id) {
+                const idx = estado.estudantes.findIndex(est => est.id === id);
+                if (idx !== -1) {
+                    estado.estudantes[idx].nome = nome;
+                    estado.estudantes[idx].telefone = telefone;
+                    estado.estudantes[idx].obs = obs;
+                    mostrarToast('Dados do formando atualizados!');
+                }
+            } else {
+                const novoEstudante = {
+                    id: 'est_' + Date.now() + '_' + Math.random().toString(36).substring(2, 5),
+                    nome,
+                    telefone,
+                    obs,
+                    ativo: true,
+                    parcelas: criarParcelasIniciais()
+                };
+
+                estado.estudantes.push(novoEstudante);
+                mostrarToast('Formando cadastrado com sucesso!');
+            }
+
+            ordenarFormandos();
+            fecharModalEstudante();
+            renderizar();
+        }
+
+        // Processar inserção em lote de vários estudantes
+        function salvarLoteEstudantes(e) {
+            e.preventDefault();
+            const textoLote = document.getElementById('inputListaLote').value;
+            if (!textoLote.trim()) return;
+
+            const linhas = textoLote.split(/\r?\n/);
+            let adicionados = 0;
+
+            linhas.forEach((linha, i) => {
+                const nomeLimpo = linha.trim();
+                if (nomeLimpo.length > 0) {
+                    // Verifica duplicidade exata para não cadastrar repetidos
+                    const jaExiste = estado.estudantes.some(est => est.nome.toLowerCase() === nomeLimpo.toLowerCase());
+                    if (!jaExiste) {
+                        const novoEstudante = {
+                            id: 'est_' + Date.now() + '_' + i + '_' + Math.random().toString(36).substring(2, 5),
+                            nome: nomeLimpo,
+                            telefone: '',
+                            obs: '',
+                            ativo: true,
+                            parcelas: criarParcelasIniciais()
+                        };
+                        estado.estudantes.push(novoEstudante);
+                        adicionados++;
+                    }
+                }
+            });
+
+            if (adicionados > 0) {
+                ordenarFormandos();
+                fecharModalLote();
+                renderizar();
+                mostrarToast(`${adicionados} formandos adicionados com sucesso!`);
+            } else {
+                alert('Nenhum formando novo foi adicionado. Verifique se os nomes já não constam na lista.');
+            }
+        }
+
+        function editarEstudante(id) {
+            const est = estado.estudantes.find(e => e.id === id);
+            if (!est) return;
+
+            document.getElementById('estudanteId').value = est.id;
+            document.getElementById('estudanteNome').value = est.nome;
+            document.getElementById('estudanteTelefone').value = est.telefone || '';
+            document.getElementById('estudanteObs').value = est.obs || '';
+            document.getElementById('modalTitulo').innerText = 'Editar Formando';
+            document.getElementById('modalEstudante').classList.remove('hidden');
+        }
+
+        function removerEstudante(id) {
+            if (confirm('Tem certeza que deseja excluir este formando? Todos os registros de pagamentos dele serão removidos.')) {
+                estado.estudantes = estado.estudantes.filter(est => est.id !== id);
+                renderizar();
+                mostrarToast('Formando removido.');
+            }
+        }
+
+        function quitarTotalmente(id) {
+            const est = estado.estudantes.find(e => e.id === id);
+            if (!est) return;
+
+            if (confirm(`Deseja marcar todas as 10 parcelas (R$ 400,00) de ${est.nome} como QUITADAS em PIX?`)) {
+                for (let i = 1; i <= QTD_PARCELAS; i++) {
+                    est.parcelas[i] = { valor: 40, meio: 'PIX' };
+                }
+                renderizar();
+                mostrarToast(`Todas as parcelas de ${est.nome} foram quitadas!`);
+            }
+        }
+
+        function abrirModalParcela(estudanteId, numParcela) {
+            const est = estado.estudantes.find(e => e.id === estudanteId);
+            if (!est) return;
+
+            parcelaEmEdicao = { estudanteId, numParcela };
+
+            const dadosP = est.parcelas[numParcela] || { valor: 0, meio: 'PIX' };
+
+            document.getElementById('modalParcelaTitulo').innerText = `Parcela ${numParcela} de 10`;
+            document.getElementById('modalParcelaSubtitulo').innerText = `Formando: ${est.nome}`;
+            document.getElementById('inputValorParcela').value = dadosP.valor || 0;
+            
+            const meioPadrao = (dadosP.meio && dadosP.meio !== 'Pendente') ? dadosP.meio : 'PIX';
+            document.getElementById('selectMeioPagamento').value = meioPadrao;
+
+            document.getElementById('modalParcela').classList.remove('hidden');
+        }
+
+        function fecharModalParcela() {
+            document.getElementById('modalParcela').classList.add('hidden');
+        }
+
+        function setValorRapido(valor) {
+            document.getElementById('inputValorParcela').value = valor;
+        }
+
+        function validarApenasNumero(element) {
+            element.value = element.value.replace(/[^0-9.,]/g, '').replace(',', '.');
+        }
+
+        function salvarAlteracaoParcela() {
+            const { estudanteId, numParcela } = parcelaEmEdicao;
+            if (!estudanteId || !numParcela) return;
+
+            const est = estado.estudantes.find(e => e.id === estudanteId);
+            if (!est) return;
+
+            const valorBruto = document.getElementById('inputValorParcela').value.replace(',', '.');
+            const valor = parseFloat(valorBruto) || 0;
+            const meio = valor > 0 ? document.getElementById('selectMeioPagamento').value : 'Pendente';
+
+            est.parcelas[numParcela] = { valor, meio };
+
+            fecharModalParcela();
+            renderizar();
+            mostrarToast('Parcela atualizada!');
+        }
+
+        function salvarCabecalho() {
+            estado.cabecalho.turma = document.getElementById('infoTurma').value;
+            estado.cabecalho.lider = document.getElementById('infoLider').value;
+            estado.cabecalho.contatoLider = limparCaracteresEspeciais(document.getElementById('infoContatoLider').value);
+            salvarLocalStorage();
+        }
+
+        // PERSISTÊNCIA DE DADOS E MONITORAMENTO DE ESPAÇO
+        function salvarLocalStorage() {
+            try {
+                ordenarFormandos();
+                localStorage.setItem('formatura_fluxo_caixa', JSON.stringify(estado));
+                verificarUsoLocalStorage();
+            } catch (e) {
+                console.error("Erro ao salvar dados no LocalStorage", e);
+                alert("Atenção: O armazenamento do seu navegador está cheio. Faça backup em JSON e limpe os dados.");
+            }
+        }
+
+        function carregarDadosSalvos() {
+            const salvos = localStorage.getItem('formatura_fluxo_caixa');
+            const mesAtualAuto = obterMesAtualAutomatico();
+
+            if (salvos) {
+                try {
+                    estado = JSON.parse(salvos);
+
+                    const turmaSalva = estado.cabecalho.turma || 'Formatura AFV 2026';
+                    document.getElementById('infoTurma').value = turmaSalva;
+                    estado.cabecalho.turma = turmaSalva;
+
+                    document.getElementById('infoLider').value = estado.cabecalho.lider || '';
+                    
+                    const contatoLimpo = limparCaracteresEspeciais(estado.cabecalho.contatoLider || estado.cabecalho.pix || '');
+                    document.getElementById('infoContatoLider').value = contatoLimpo;
+                    estado.cabecalho.contatoLider = contatoLimpo;
+
+                    // Sincroniza dinamicamente para o mês atual real
+                    estado.cabecalho.mesVigente = mesAtualAuto;
+
+                    // Restaura estado do painel recolhível
+                    if (estado.cabecalho.painelRecolhido) {
+                        document.getElementById('conteudoPainelInfo').classList.add('hidden');
+                        document.getElementById('setaToggleInfo').classList.add('rotate-180');
+                        document.getElementById('labelToggleInfo').innerText = 'Mostrar Painel';
+                    }
+                } catch (e) {
+                    console.error("Erro ao carregar dados do LocalStorage", e);
+                }
+            } else {
+                estado.cabecalho.mesVigente = mesAtualAuto;
+            }
+            ordenarFormandos();
+        }
+
+        function verificarUsoLocalStorage() {
+            const dadosStr = localStorage.getItem('formatura_fluxo_caixa') || '';
+            const tamanhoKB = (dadosStr.length * 2) / 1024;
+            const banner = document.getElementById('bannerAlertaStorage');
+            const texto = document.getElementById('textoAlertaStorage');
+
+            if (tamanhoKB > 3500) {
+                banner.classList.remove('hidden');
+                texto.innerText = `O armazenamento do sistema atingiu ${tamanhoKB.toFixed(0)} KB (cerca de ${(tamanhoKB/50).toFixed(0)}% da capacidade). Faça um backup .JSON para prevenir perdas.`;
+            } else {
+                banner.classList.add('hidden');
+            }
+        }
+
+        function confirmarLimpezaLocalStorage() {
+            if (confirm("ATENÇÃO: Deseja realmente ZERAR todos os dados salvos neste navegador? Esta ação não pode ser desfeita sem um backup exportado.")) {
+                if (confirm("Confirmação final: Todos os alunos e pagamentos serão apagados. Continuar?")) {
+                    localStorage.removeItem('formatura_fluxo_caixa');
+                    estado = {
+                        cabecalho: {
+                            turma: 'Formatura AFV 2026',
+                            lider: '',
+                            contatoLider: '',
+                            mesVigente: obterMesAtualAutomatico(),
+                            painelRecolhido: false
+                        },
+                        estudantes: []
+                    };
+                    atualizarInputsCabecalho();
+                    renderizar();
+                    mostrarToast('Dados do navegador zerados com sucesso.');
+                }
+            }
+        }
+
+        function salvarDadosComAlerta() {
+            salvarLocalStorage();
+            mostrarToast('Dados salvos no navegador com sucesso!');
+        }
+
+        function exportarJSON() {
+            ordenarFormandos();
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(estado, null, 2));
+            const downloadAnchor = document.createElement('a');
+            const nomeTurma = (estado.cabecalho.turma || 'turma').toLowerCase().replace(/[^a-z0-9]/g, '_');
+            const dataHoje = new Date().toISOString().split('T')[0];
+
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `base_formatura_${nomeTurma}_${dataHoje}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+
+            mostrarToast('Base de dados exportada!');
+        }
+
+        function importarArquivoJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    const dados = JSON.parse(e.target.result);
+                    if (dados && (dados.estudantes || Array.isArray(dados))) {
+                        estado = dados.estudantes ? dados : { cabecalho: { turma: 'Formatura AFV 2026', lider: '', contatoLider: '' }, estudantes: dados };
+                        if (estado.cabecalho) {
+                            estado.cabecalho.turma = estado.cabecalho.turma || 'Formatura AFV 2026';
+                            estado.cabecalho.contatoLider = limparCaracteresEspeciais(estado.cabecalho.contatoLider || estado.cabecalho.pix || '');
+                        }
+                        estado.cabecalho.mesVigente = obterMesAtualAutomatico();
+                        ordenarFormandos();
+                        atualizarInputsCabecalho();
+                        renderizar();
+                        mostrarToast('Dados JSON importados com sucesso!');
+                    } else {
+                        alert('Formato de arquivo JSON inválido.');
+                    }
+                } catch (err) {
+                    console.error("Erro na importação JSON:", err);
+                    alert('Erro ao processar o arquivo JSON. Verifique se a estrutura é válida.');
+                }
+                event.target.value = '';
+            };
+
+            reader.readAsText(file);
+        }
+
+        // BAIXAR MODELO CSV PREENCHÍVEL
+        function baixarModeloCSV() {
+            let csv = '\uFEFF';
+            csv += 'Nome do Formando;Telefone;Status Ativo;';
+            for (let i = 1; i <= QTD_PARCELAS; i++) {
+                csv += `P${i} Valor;P${i} Meio;`;
+            }
+            csv += '\n';
+
+            // Exemplos para orientação do usuário
+            csv += 'João Pedro Silva;79988888888;SIM;40;PIX;20;PIX;0;Pendente;0;Pendente;0;Pendente;0;Pendente;0;Pendente;0;Pendente;0;Pendente;0;Pendente\n';
+            csv += 'Maria Eduarda Santos;79999999999;SIM;40;PIX;40;Espécie;0;Pendente;0;Pendente;0;Pendente;0;Pendente;0;Pendente;0;Pendente;0;Pendente;0;Pendente\n';
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'modelo_importacao_formatura.csv');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            mostrarToast('Modelo CSV baixado com sucesso!');
+        }
+
+        function importarArquivoCSV(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    processarImportacaoCSV(e.target.result);
+                } catch (err) {
+                    console.error("Erro na importação CSV:", err);
+                    alert('Erro ao processar o arquivo CSV.');
+                }
+                event.target.value = '';
+            };
+
+            reader.readAsText(file);
+        }
+
+        // CORREÇÃO DA IMPORTAÇÃO CSV PARA LER CORRETAMENTE PARCELAS, TELEFONE E STATUS
+        function processarImportacaoCSV(textoCSV) {
+            const linhas = textoCSV.split(/\r\n|\n/).filter(line => line.trim() !== '');
+            if (linhas.length < 2) {
+                alert('O arquivo CSV selecionado está vazio ou não possui cabeçalhos.');
+                return;
+            }
+
+            const separador = textoCSV.includes(';') ? ';' : ',';
+            const novosEstudantes = [];
+
+            for (let i = 1; i < linhas.length; i++) {
+                const colunas = linhas[i].split(separador).map(col => col.replace(/^"|"$/g, '').trim());
+                if (colunas.length < 2 || !colunas[0]) continue;
+
+                const nome = colunas[0];
+                const telefone = colunas[1] || '';
+                
+                // Verifica se a 3ª coluna indica status ativo/inativo ou se já pula direto para as parcelas
+                let colIndex = 2;
+                let ativo = true;
+                if (colunas[2] && (colunas[2].toUpperCase() === 'SIM' || colunas[2].toUpperCase() === 'NÃO')) {
+                    ativo = colunas[2].toUpperCase() === 'SIM';
+                    colIndex = 3;
+                }
+
+                const parcelas = {};
+                for (let p = 1; p <= QTD_PARCELAS; p++) {
+                    const valNum = parseFloat(colunas[colIndex] ? colunas[colIndex].replace(',', '.') : 0) || 0;
+                    const meio = colunas[colIndex + 1] ? colunas[colIndex + 1] : (valNum > 0 ? 'PIX' : 'Pendente');
+                    parcelas[p] = { valor: valNum, meio: meio };
+                    colIndex += 2;
+                }
+
+                novosEstudantes.push({
+                    id: 'est_' + Date.now() + '_' + i + '_' + Math.random().toString(36).substring(2, 5),
+                    nome: nome,
+                    telefone: telefone,
+                    obs: '',
+                    ativo: ativo,
+                    parcelas: parcelas
+                });
+            }
+
+            if (novosEstudantes.length > 0) {
+                estado.estudantes = novosEstudantes;
+                ordenarFormandos();
+                renderizar();
+                mostrarToast(`${novosEstudantes.length} formandos importados via CSV com sucesso!`);
+            } else {
+                alert('Nenhum formando válido encontrado no CSV.');
+            }
+        }
+
+        function atualizarInputsCabecalho() {
+            document.getElementById('infoTurma').value = estado.cabecalho.turma || '';
+            document.getElementById('infoLider').value = estado.cabecalho.lider || '';
+            document.getElementById('infoContatoLider').value = limparCaracteresEspeciais(estado.cabecalho.contatoLider || '');
+            document.getElementById('selectMesVigente').value = estado.cabecalho.mesVigente;
+        }
+
+        function exportarCSV() {
+            if (estado.estudantes.length === 0) {
+                alert('Nenhum dado para exportar.');
+                return;
+            }
+
+            ordenarFormandos();
+
+            let csv = '\uFEFF';
+            csv += 'Nome do Formando;Telefone;Status Ativo;';
+            for (let i = 1; i <= QTD_PARCELAS; i++) {
+                csv += `P${i} Valor;P${i} Meio;`;
+            }
+            csv += 'Total Pago;Status\n';
+
+            estado.estudantes.forEach(est => {
+                let totalPago = 0;
+                let linha = `"${est.nome}";"${est.telefone || ''}";"${est.ativo !== false ? 'SIM' : 'NÃO'}";`;
+
+                for (let p = 1; p <= QTD_PARCELAS; p++) {
+                    const dadosP = est.parcelas[p] || { valor: 0, meio: 'Pendente' };
+                    const val = parseFloat(dadosP.valor) || 0;
+                    totalPago += val;
+                    linha += `${val.toFixed(2)};"${dadosP.meio}";`;
+                }
+
+                let status = totalPago >= VALOR_TOTAL_FORMANDO ? 'QUITADO' : (totalPago > 0 ? 'EM DIA' : 'PENDENTE');
+                linha += `${totalPago.toFixed(2)};"${status}"\n`;
+                csv += linha;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            const nomeTurma = (estado.cabecalho.turma || 'turma').toLowerCase().replace(/[^a-z0-9]/g, '_');
+
+            link.setAttribute('href', url);
+            link.setAttribute('download', `relatorio_excel_${nomeTurma}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            mostrarToast('Planilha Excel gerada com sucesso!');
+        }
+
+        // GERAR RELATÓRIO PDF EM MODO RETRATO A4 (FILTRANDO APENAS FORMANDOS ATIVOS)
+        function gerarPDF() {
+            ordenarFormandos();
+
+            // Preenche dados do cabeçalho do PDF
+            document.getElementById('pdfTurmaInfo').innerText = estado.cabecalho.turma || 'Formatura AFV 2026';
+            document.getElementById('pdfLiderInfo').innerText = estado.cabecalho.lider || 'Não informado';
+            document.getElementById('pdfContatoLiderInfo').innerText = estado.cabecalho.contatoLider || 'Não informado';
+            
+            const agora = new Date();
+            document.getElementById('pdfDataGeracao').innerText = `Gerado em: ${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}`;
+
+            // Constrói tabela minimalista e organizada para Portrait (SOMENTE FORMANDOS ATIVOS)
+            const tbodyPDF = document.getElementById('pdfTabelaCorpo');
+            tbodyPDF.innerHTML = '';
+
+            let totalGeralAtivos = 0;
+            let totalPixAtivos = 0;
+            let totalEspecieAtivos = 0;
+            let qtdAtivos = 0;
+
+            const formandosAtivos = estado.estudantes.filter(est => est.ativo !== false);
+
+            formandosAtivos.forEach((est, idx) => {
+                qtdAtivos++;
+                let totalEstudante = 0;
+                let quitadasCount = 0;
+
+                for (let p = 1; p <= QTD_PARCELAS; p++) {
+                    const dadosP = est.parcelas[p] || { valor: 0, meio: 'Pendente' };
+                    const val = parseFloat(dadosP.valor) || 0;
+                    totalEstudante += val;
+                    if (val >= VALOR_PARCELA) quitadasCount++;
+
+                    if (val > 0) {
+                        if (dadosP.meio === 'PIX') totalPixAtivos += val;
+                        else if (dadosP.meio === 'Espécie') totalEspecieAtivos += val;
+                        else if (dadosP.meio === 'Ambos') {
+                            totalPixAtivos += val / 2;
+                            totalEspecieAtivos += val / 2;
+                        }
+                    }
+                }
+
+                totalGeralAtivos += totalEstudante;
+
+                const statusInfo = calcularStatusEstudante(est);
+
+                const telExibicao = est.telefone ? est.telefone : null;
+                const obsExibicao = est.obs ? est.obs : null;
+
+                let infoAdicionalHTML = '';
+                if (telExibicao || obsExibicao) {
+                    let partes = [];
+                    if (telExibicao) partes.push(`<strong>Tel:</strong> ${telExibicao}`);
+                    if (obsExibicao) partes.push(`<strong>Obs:</strong> ${obsExibicao}`);
+                    infoAdicionalHTML = `<div class="text-[9px] text-slate-500 font-normal mt-0.5">${partes.join(' • ')}</div>`;
+                }
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="text-center font-bold text-slate-400">${idx + 1}</td>
+                    <td>
+                        <div class="font-semibold text-slate-800">${est.nome}</div>
+                        ${infoAdicionalHTML}
+                    </td>
+                    <td class="text-center font-bold text-indigo-900">${quitadasCount} / 10 parcelas</td>
+                    <td class="text-right font-black text-slate-900">R$ ${totalEstudante.toFixed(2)}</td>
+                    <td class="text-center">
+                        <span class="inline-block text-[9px] font-extrabold px-2 py-0.5 rounded-full ${statusInfo.cor}">
+                            ${statusInfo.texto}
+                        </span>
+                    </td>
+                `;
+                tbodyPDF.appendChild(tr);
+            });
+
+            const metaAtivos = qtdAtivos * VALOR_TOTAL_FORMANDO;
+            const pendenteAtivos = metaAtivos - totalGeralAtivos;
+
+            document.getElementById('pdfTotalArrecadado').innerText = `R$ ${totalGeralAtivos.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            document.getElementById('pdfTotalPendente').innerText = `R$ ${pendenteAtivos.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            document.getElementById('pdfTotalPix').innerText = `R$ ${totalPixAtivos.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            document.getElementById('pdfTotalEspecie').innerText = `R$ ${totalEspecieAtivos.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+
+            document.getElementById('pdfFootTotalGeral').innerText = `R$ ${totalGeralAtivos.toFixed(2)}`;
+
+            // Exibe elemento temporariamente para captura do PDF
+            const containerPDF = document.getElementById('areaRelatorioPDF');
+            containerPDF.classList.remove('hidden');
+
+            const element = containerPDF.firstElementChild;
+
+            const opt = {
+                margin:       [10, 10, 10, 10],
+                filename:     `Relatorio_Formatura_AFV_2026_${(estado.cabecalho.turma || 'turma').replace(/[^a-z0-9]/gi, '_')}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            mostrarToast('Gerando relatório PDF (Somente formandos ativos)...');
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                containerPDF.classList.add('hidden');
+                mostrarToast('Relatório PDF baixado com sucesso!');
+            }).catch(() => {
+                containerPDF.classList.add('hidden');
+            });
+        }
+
+        function mostrarToast(mensagem) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMensagem').innerText = mensagem;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

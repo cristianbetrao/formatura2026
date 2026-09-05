@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contador de Cédulas e Moedas</title>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --accent-green: #059669;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --radius: 12px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); padding: 2rem 1rem; min-height: 100vh; }
+        .container { max-width: 900px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 2rem; }
+        header h1 { font-size: 1.8rem; font-weight: 700; color: var(--text-main); }
+        header p { color: var(--text-muted); font-size: 0.95rem; margin-top: 0.4rem; }
+
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+
+        .summary-card {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            color: #ffffff;
+            padding: 1.5rem 2rem;
+            border-radius: var(--radius);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .summary-info label { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; display: block; margin-bottom: 0.25rem; }
+        .summary-info .total-val { font-size: 2.2rem; font-weight: 700; color: #38bdf8; }
+
+        .btn-print {
+            background-color: var(--primary);
+            color: white; border: none; padding: 0.75rem 1.5rem; font-size: 0.95rem; font-weight: 600;
+            border-radius: 8px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 0.5rem;
+        }
+        .btn-print:hover { background-color: var(--primary-hover); }
+
+        .section-title {
+            font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-main);
+            display: flex; align-items: center; gap: 0.5rem; border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem;
+        }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; margin-bottom: 2.5rem; }
+
+        .item-card {
+            background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius);
+            padding: 0.85rem; display: flex; align-items: center; gap: 1rem; box-shadow: var(--shadow-sm);
+        }
+        .item-card:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
+
+        /* Estilização vetorial ultra-fiel para Cédulas e Moedas */
+        .bill-img {
+            width: 82px; height: 48px; border-radius: 6px; display: flex; align-items: center; justify-content: center;
+            font-weight: 800; color: rgba(255,255,255,0.95); font-size: 1rem; letter-spacing: -0.5px;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.15), inset 0 0 0 2px rgba(255,255,255,0.3);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.4); flex-shrink: 0; position: relative; overflow: hidden;
+        }
+        .bill-img::before {
+            content: ""; position: absolute; width: 34px; height: 34px; border-radius: 50%;
+            background: rgba(255,255,255,0.15); top: 7px; left: -10px; border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .b-200 { background: linear-gradient(135deg, #57534e, #a8a29e); }
+        .b-100 { background: linear-gradient(135deg, #0369a1, #38bdf8); }
+        .b-50  { background: linear-gradient(135deg, #b45309, #fbbf24); }
+        .b-20  { background: linear-gradient(135deg, #a16207, #facc15); }
+        .b-10  { background: linear-gradient(135deg, #b91c1c, #f87171); }
+        .b-5   { background: linear-gradient(135deg, #7e22ce, #c084fc); }
+        .b-2   { background: linear-gradient(135deg, #047857, #34d399); }
+
+        .coin-img {
+            width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            text-align: center; font-weight: 800; flex-shrink: 0; box-shadow: 0 3px 6px rgba(0,0,0,0.15), inset 0 0 0 2px rgba(255,255,255,0.5);
+            font-size: 0.8rem; border: 3px solid; line-height: 1.1;
+        }
+        .c-100 { background: radial-gradient(circle, #fef08a, #ca8a04); border-color: #94a3b8; color: #713f12; }
+        .c-050 { background: radial-gradient(circle, #ffffff, #cbd5e1); border-color: #94a3b8; color: #0f172a; }
+        .c-025 { background: radial-gradient(circle, #fde68a, #d97706); border-color: #d97706; color: #78350f; }
+        .c-010 { background: radial-gradient(circle, #fef08a, #ca8a04); border-color: #ca8a04; color: #713f12; }
+        .c-005 { background: radial-gradient(circle, #fed7aa, #c2410c); border-color: #9a3412; color: #431407; }
+
+        .item-details { flex-grow: 1; }
+        .item-title { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.25rem; font-weight: 600; }
+        .input-group input {
+            width: 100%; padding: 0.4rem 0.6rem; border: 1px solid var(--border-color); border-radius: 6px;
+            font-size: 1rem; font-weight: 600; color: var(--text-main); outline: none;
+        }
+        .input-group input:focus { border-color: var(--primary); }
+        .subtotal { font-size: 0.85rem; color: var(--accent-green); font-weight: 600; margin-top: 0.25rem; text-align: right; }
+
+        @media print {
+            body { background-color: #ffffff; color: #000000; padding: 0; }
+            .no-print, .btn-print, .btn-reset { display: none !important; }
+            .summary-card { background: #f1f5f9 !important; color: #0f172a !important; border: 2px solid #cbd5e1; box-shadow: none; }
+            .summary-info .total-val { color: #0f172a !important; }
+            .grid { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+            .item-card { border: 1px solid #cbd5e1; box-shadow: none; padding: 0.5rem; }
+            .input-group input { border: none; background: transparent; }
+            .report-header { display: block !important; margin-bottom: 1.5rem; text-align: center; border-bottom: 2px solid #000; padding-bottom: 1rem; }
+        }
+
+        .report-header { display: none; }
+        .footer-actions { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem; }
+        .btn-reset { background: transparent; color: var(--text-muted); border: 1px solid var(--border-color); padding: 0.75rem 1.5rem; font-size: 0.95rem; font-weight: 600; border-radius: 8px; cursor: pointer; }
+        .btn-reset:hover { background-color: #f1f5f9; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="report-header">
+        <h2>RELATÓRIO DE PRESTAÇÃO DE CONTAS</h2>
+        <p>Conferência de Cédulas e Moedas em Espécie</p>
+        <p id="print-date" style="font-size: 0.85rem; margin-top: 4px; color: #475569;"></p>
+    </div>
+
+    <header class="no-print">
+        <h1>Contador de Cédulas e Moedas</h1>
+        <p>Informe a quantidade de cada valor para calcular o total e emitir o relatório.</p>
+    </header>
+
+    <div class="summary-card">
+        <div class="summary-info">
+            <label>Valor Total em Caixa</label>
+            <div class="total-val" id="grand-total">R$ 0,00</div>
+        </div>
+        <button class="btn-print" onclick="generateReport()">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"></path></svg>
+            Gerar Relatório PDF
+        </button>
+    </div>
+
+    <!-- CÉDULAS -->
+    <div class="section-title">💵 Cédulas</div>
+    <div class="grid" id="bills-grid"></div>
+
+    <!-- MOEDAS -->
+    <div class="section-title">🪙 Moedas</div>
+    <div class="grid" id="coins-grid"></div>
+
+    <div class="footer-actions no-print">
+        <button class="btn-reset" onclick="resetForm()">Limpar Campos</button>
+    </div>
+</div>
+
+<script>
+    const BARK_DENOMINATIONS = [
+        { val: 200.00, label: 'R$ 200,00', class: 'b-200', text: 'R$ 200' },
+        { val: 100.00, label: 'R$ 100,00', class: 'b-100', text: 'R$ 100' },
+        { val: 50.00,  label: 'R$ 50,00',  class: 'b-50',  text: 'R$ 50' },
+        { val: 20.00,  label: 'R$ 20,00',  class: 'b-20',  text: 'R$ 20' },
+        { val: 10.00,  label: 'R$ 10,00',  class: 'b-10',  text: 'R$ 10' },
+        { val: 5.00,   label: 'R$ 5,00',   class: 'b-5',   text: 'R$ 5' },
+        { val: 2.00,   label: 'R$ 2,00',   class: 'b-2',   text: 'R$ 2' }
+    ];
+
+    const COIN_DENOMINATIONS = [
+        { val: 1.00, label: 'R$ 1,00', class: 'c-100', text: '1,00' },
+        { val: 0.50, label: 'R$ 0,50', class: 'c-050', text: '0,50' },
+        { val: 0.25, label: 'R$ 0,25', class: 'c-025', text: '0,25' },
+        { val: 0.10, label: 'R$ 0,10', class: 'c-010', text: '0,10' },
+        { val: 0.05, label: 'R$ 0,05', class: 'c-005', text: '0,05' }
+    ];
+
+    const quantities = {};
+
+    function formatCurrency(val) {
+        return val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    function createCard(item, isCoin = false) {
+        const id = 'val_' + item.val.toString().replace('.', '_');
+        quantities[id] = 0;
+
+        const card = document.createElement('div');
+        card.className = 'item-card';
+
+        const visualHtml = isCoin
+            ? `<div class="coin-img ${item.class}">R$ ${item.text}</div>`
+            : `<div class="bill-img ${item.class}">${item.text}</div>`;
+
+        card.innerHTML = `
+            ${visualHtml}
+            <div class="item-details">
+                <div class="item-title">${item.label}</div>
+                <div class="input-group">
+                    <input type="number" id="${id}" min="0" placeholder="0" oninput="updateTotal('${id}', ${item.val})">
+                </div>
+                <div class="subtotal" id="sub_${id}">R$ 0,00</div>
+            </div>
+        `;
+        return card;
+    }
+
+    function init() {
+        const billsGrid = document.getElementById('bills-grid');
+        BARK_DENOMINATIONS.forEach(item => billsGrid.appendChild(createCard(item, false)));
+
+        const coinsGrid = document.getElementById('coins-grid');
+        COIN_DENOMINATIONS.forEach(item => coinsGrid.appendChild(createCard(item, true)));
+
+        // Previne alteração nos números ao usar a rodinha do mouse (scroll)
+        document.addEventListener('wheel', function () {
+            if (document.activeElement.type === 'number') {
+                document.activeElement.blur();
+            }
+        });
+    }
+
+    function updateTotal(id, val) {
+        const input = document.getElementById(id);
+        const qty = parseInt(input.value) || 0;
+        quantities[id] = qty * val;
+
+        document.getElementById('sub_' + id).innerText = formatCurrency(quantities[id]);
+
+        const grandTotal = Object.values(quantities).reduce((acc, curr) => acc + curr, 0);
+        document.getElementById('grand-total').innerText = formatCurrency(grandTotal);
+    }
+
+    function resetForm() {
+        Object.keys(quantities).forEach(id => {
+            const input = document.getElementById(id);
+            if (input) input.value = '';
+            quantities[id] = 0;
+            document.getElementById('sub_' + id).innerText = 'R$ 0,00';
+        });
+        document.getElementById('grand-total').innerText = 'R$ 0,00';
+    }
+
+    function generateReport() {
+        const now = new Date();
+        document.getElementById('print-date').innerText = 'Data de Emissão: ' + now.toLocaleString('pt-BR');
+        window.print();
+    }
+
+    window.onload = init;
+</script>
+</body>
+</html>
