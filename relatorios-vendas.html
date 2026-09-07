@@ -334,9 +334,9 @@
             <div id="pdfPrintArea" class="p-5 sm:p-10 overflow-y-auto bg-white flex-1 space-y-6 sm:space-y-8 text-slate-800">
                 <div class="border-b border-slate-200 pb-5 sm:pb-6 flex flex-col sm:flex-row justify-between items-start gap-4">
                     <div>
-                        <span class="text-[11px] sm:text-xs font-extrabold tracking-widest text-indigo-600 uppercase">Comissão de Formatura Escolar</span>
-                        <h1 class="text-xl sm:text-3xl font-black text-slate-900 mt-1">Relatório - Venda de Lanches  2026</h1>
-                        <p class="text-xs text-slate-500 mt-1">Prestação de Contas Oficial - Arrecadação Estudantil</p>
+                        <span class="text-[11px] sm:text-xs font-extrabold tracking-widest text-indigo-600 uppercase">Comissão da Formatura 2026</span>
+                        <h1 class="text-xl sm:text-3xl font-black text-slate-900 mt-1">Relatório - Venda de Lanches</h1>
+                        <p class="text-xs text-slate-500 mt-1">Prestação de Contas Oficial</p>
                     </div>
                     <div class="text-left sm:text-right">
                         <div class="text-[11px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">ID do Relatório</div>
@@ -411,7 +411,7 @@
                             </div>
                         </div>
                         <button onclick="approveCurrentReport()" id="approveBtnAction" class="no-print hidden w-full sm:w-auto px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center justify-center gap-2 shrink-0">
-                            <i class="fa-solid fa-check-to-slot"></i> Aprovar & Assinar Relatório
+                            <i class="fa-solid fa-check-to-slot"></i> Aprovar Relatório
                         </button>
                     </div>
 
@@ -430,7 +430,7 @@
                             <span class="px-3.5 py-1 bg-emerald-200 text-emerald-800 text-[11px] sm:text-xs font-bold rounded-full uppercase tracking-wider self-start sm:self-auto">Validado</span>
                         </div>
                         <div class="text-[11px] sm:text-xs text-emerald-800 border-t border-emerald-200/60 pt-2.5 flex flex-col sm:flex-row justify-between gap-1">
-                            <span>Aprovador: <strong id="approverNameDisplay">Comissão Organizadora - 2026</strong></span>
+                            <span>Aprovador: <strong id="approverNameDisplay">Comissão Organizadora 2026</strong></span>
                             <span class="font-bold text-emerald-900 text-right uppercase tracking-wider" id="approvalSimpleBadge">APROVADO</span>
                         </div>
                     </div>
@@ -943,7 +943,7 @@
 
             item.status = 'approved';
             item.approvedAt = formatCurrentTimestamp();
-            item.approver = 'Comissão Organizadora - AFV/2026';
+            item.approver = 'Comissão Organizadora 2026';
 
             saveCommissionData();
             const studentItemIndex = studentClosings.findIndex(i => i.id === activeReportId);
