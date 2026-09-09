@@ -8,9 +8,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- html2pdf.js for direct PDF generation and download -->
+    <!-- html2pdf.js para geração direta do PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <!-- Google Fonts: Plus Jakarta Sans for UI & Merriweather for Formal Headers -->
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;1,300&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
@@ -58,161 +58,86 @@
             opacity: 1;
         }
 
-        /* STRICT PDF EXPORT FORMATTING OVERRIDES (OFF-SCREEN A4 CLONE ENGINE) */
-        #printableAreaClone * {
+        /* ESTILOS EXCLUSIVOS DO RELATÓRIO PDF (INDEPENDENTE DA TELA) */
+        .pdf-page-template {
+            width: 700px !important;
+            margin: 0 auto !important;
+            padding: 20px !important;
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+            font-size: 10pt !important;
+            line-height: 1.3 !important;
             box-sizing: border-box !important;
         }
 
-        #printableAreaClone {
-            width: 794px !important;
-            max-width: 794px !important;
-            min-width: 794px !important;
-            margin: 0 !important;
-            padding: 24px 28px !important;
-            background-color: #ffffff !important;
-        }
-
-        #printableAreaClone .header-flex {
-            display: flex !important;
-            flex-direction: row !important;
-            align-items: flex-start !important;
-            justify-content: space-between !important;
-            gap: 16px !important;
-            width: 100% !important;
-        }
-
-        #printableAreaClone .metrics-grid {
-            display: grid !important;
-            grid-template-columns: repeat(4, 1fr) !important;
-            gap: 10px !important;
-            width: 100% !important;
-        }
-
-        #printableAreaClone .metrics-grid .print-card {
-            padding: 10px !important;
-        }
-
-        #printableAreaClone .metrics-grid span.text-base {
-            font-size: 11pt !important;
-            line-height: 1.2 !important;
-        }
-
-        #printableAreaClone .category-grid {
-            display: grid !important;
-            grid-template-columns: repeat(4, 1fr) !important;
-            gap: 8px !important;
-            width: 100% !important;
-        }
-
-        #printableAreaClone .signatures-grid {
-            display: grid !important;
-            grid-template-columns: repeat(2, 1fr) !important;
-            gap: 32px !important;
-            width: 100% !important;
-        }
-
-        #printableAreaClone table {
-            table-layout: fixed !important;
+        .pdf-page-template table {
             width: 100% !important;
             border-collapse: collapse !important;
+            table-layout: fixed !important;
         }
 
-        #printableAreaClone th, 
-        #printableAreaClone td {
+        .pdf-page-template th,
+        .pdf-page-template td {
             word-wrap: break-word !important;
             overflow-wrap: break-word !important;
-            padding: 6px 6px !important;
-            font-size: 8pt !important;
+            font-size: 8.5pt !important;
+            padding: 5px 6px !important;
+            border-bottom: 1px solid #e2e8f0 !important;
         }
 
-        #printableAreaClone th:nth-child(1), #printableAreaClone td:nth-child(1) { width: 12% !important; }
-        #printableAreaClone th:nth-child(2), #printableAreaClone td:nth-child(2) { width: 34% !important; }
-        #printableAreaClone th:nth-child(3), #printableAreaClone td:nth-child(3) { width: 18% !important; }
-        #printableAreaClone th:nth-child(4), #printableAreaClone td:nth-child(4) { width: 12% !important; }
-        #printableAreaClone th:nth-child(5), #printableAreaClone td:nth-child(5) { width: 12% !important; }
-        #printableAreaClone th:nth-child(6), #printableAreaClone td:nth-child(6) { width: 12% !important; }
+        .pdf-page-template th {
+            background-color: #f1f5f9 !important;
+            color: #1e293b !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            font-size: 7.5pt !important;
+            letter-spacing: 0.5px !important;
+            border-top: 1px solid #cbd5e1 !important;
+            border-bottom: 2px solid #cbd5e1 !important;
+        }
 
-        /* STRICT A4 PRINT STYLES */
+        .pdf-avoid-break {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+        }
+
+        /* IMPRESSÃO NATIVA (Ctrl+P) */
         @media print {
             @page {
                 size: A4 portrait;
-                margin: 10mm 12mm 10mm 12mm;
+                margin: 10mm;
             }
 
             body {
                 background-color: #ffffff !important;
-                color: #000000 !important;
-                font-size: 9pt;
-                line-height: 1.35;
             }
 
-            /* Hide all interactive elements during PDF export/printing */
             .no-print,
-            button,
-            .action-col,
-            .edit-btn,
             #mobileHeader,
             #sidebarPanel,
-            #editModal {
+            #editModal,
+            #confirmModal,
+            #toastNotification,
+            header {
                 display: none !important;
             }
 
-            .print-full-width {
+            #reportContainer {
                 width: 100% !important;
-                max-width: 100% !important;
                 margin: 0 !important;
                 padding: 0 !important;
-                box-shadow: none !important;
-                border: none !important;
-            }
-
-            .print-card {
-                border: 1px solid #cbd5e1 !important;
-                box-shadow: none !important;
-                background-color: #ffffff !important;
-            }
-
-            .print-table {
-                width: 100% !important;
-                border-collapse: collapse !important;
-            }
-
-            .print-table th,
-            .print-table td {
-                border: 1px solid #94a3b8 !important;
-                padding: 5px 8px !important;
-                font-size: 8.5pt;
-            }
-
-            .print-table th {
-                background-color: #f8fafc !important;
-                color: #0f172a !important;
-                font-weight: 700 !important;
-            }
-
-            .signature-block {
-                margin-top: 25px !important;
-                page-break-inside: avoid;
-            }
-
-            .income-text {
-                color: #15803d !important;
-            }
-
-            .expense-text {
-                color: #b91c1c !important;
             }
         }
     </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased bg-slate-50 text-slate-800">
 
-    <!-- Modern Clean Light Header -->
+    <!-- Header Principal -->
     <header class="no-print bg-white/90 backdrop-blur-md sticky top-0 z-30 border-b border-slate-200 shadow-2xs">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16 gap-4">
                 
-                <!-- Left Title & Branding -->
+                <!-- Título e Marca -->
                 <div class="flex items-center gap-3">
                     <button onclick="toggleSidebar()" class="text-slate-600 hover:text-slate-900 p-2.5 rounded-xl hover:bg-slate-100 transition border border-slate-200" title="Alternar Painel de Lançamentos">
                         <i class="fa-solid fa-bars text-lg"></i>
@@ -232,24 +157,23 @@
                     </div>
                 </div>
 
-                <!-- Right Toolbar & Action Dropdown Menu -->
+                <!-- Botões de Ação -->
                 <div class="flex items-center gap-2">
                     
-                    <!-- Print / Generate PDF Button (Primary Action) -->
+                    <!-- Botão de Ação Principal: Gerar PDF -->
                     <button onclick="generatePDF()" id="pdfBtn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-xs font-bold rounded-xl shadow-sm shadow-blue-600/30 transition flex items-center gap-2 transform active:scale-95">
                         <i class="fa-solid fa-file-pdf text-sm"></i>
                         <span class="hidden sm:inline">Gerar PDF / Imprimir</span>
                         <span class="sm:hidden">PDF</span>
                     </button>
 
-                    <!-- Dropdown Menu Trigger -->
+                    <!-- Menu Dropdown -->
                     <div class="relative">
                         <button id="menuDropdownBtn" onclick="toggleMenuDropdown(event)" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl border border-slate-200 transition flex items-center gap-1.5 focus:ring-2 focus:ring-blue-500">
                             <i class="fa-solid fa-ellipsis-vertical text-sm"></i>
                             <span class="hidden md:inline">Opções</span>
                         </button>
 
-                        <!-- Dropdown Content Box -->
                         <div id="menuDropdown" class="hidden absolute right-0 mt-2 w-60 bg-white rounded-2xl shadow-xl border border-slate-200 py-2 z-50 fade-in">
                             <div class="px-3 py-1.5 border-b border-slate-100 mb-1">
                                 <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Ações do Sistema</p>
@@ -260,7 +184,6 @@
                                 <span>Abrir / Fechar Lançamentos</span>
                             </button>
 
-                            <!-- Botão Manual de Salvar no LocalStorage -->
                             <button onclick="saveManualToLocalStorage(); closeMenuDropdown();" class="w-full text-left px-4 py-2 text-xs font-medium text-emerald-700 hover:bg-emerald-50 flex items-center gap-2.5">
                                 <i class="fa-solid fa-floppy-disk text-emerald-600 w-4"></i>
                                 <span>Salvar no LocalStorage</span>
@@ -291,13 +214,12 @@
         </div>
     </header>
 
-    <!-- Main Content Area -->
+    <!-- Área de Conteúdo Principal -->
     <div class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 lg:p-6 flex flex-col lg:flex-row gap-6 relative">
 
-        <!-- LEFT CONTROL PANEL (Collapsible - Starts Hidden) -->
+        <!-- PAINEL LATERAL (Formulário) -->
         <aside id="sidebarPanel" class="no-print hidden w-full lg:w-96 flex-shrink-0 space-y-5 transition-all duration-300">
             
-            <!-- Entry Form Card -->
             <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
                 <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
                     <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2">
@@ -336,20 +258,15 @@
                         <div class="flex items-center justify-between mb-1">
                             <label class="block text-xs font-semibold text-slate-700">Categoria</label>
                             <span class="text-[10px] text-blue-600 font-semibold flex items-center gap-1">
-                                <i class="fa-solid fa-wand-magic-sparkles text-[9px]"></i> Sugestões inteligentes
+                                <i class="fa-solid fa-wand-magic-sparkles text-[9px]"></i> Sugestões
                             </span>
                         </div>
                         <input type="text" id="entryCategory" list="categoriesList" autocomplete="off" oninput="filterCategorySuggestions(this.value)" placeholder="Ex: Vendas, Salários, Impostos" class="w-full text-xs p-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition font-medium text-slate-800">
-                        <datalist id="categoriesList">
-                            <!-- Preenchido dinamicamente com base no histórico de lançamentos -->
-                        </datalist>
+                        <datalist id="categoriesList"></datalist>
 
-                        <!-- Tags / Pills de Acesso Rápido para Categorias Sugeridas -->
                         <div class="mt-2">
                             <span id="quickCatTitle" class="text-[10px] text-slate-400 font-medium block mb-1">Categorias frequentes e recentes:</span>
-                            <div id="quickCategories" class="flex flex-wrap gap-1.5">
-                                <!-- Renderizado dinamicamente -->
-                            </div>
+                            <div id="quickCategories" class="flex flex-wrap gap-1.5"></div>
                         </div>
                     </div>
 
@@ -368,7 +285,6 @@
                 </form>
             </div>
 
-            <!-- Contextual Help Card -->
             <div class="bg-blue-50/70 border border-blue-200/80 p-4 rounded-2xl text-xs text-blue-900 space-y-2">
                 <h3 class="font-bold flex items-center gap-2 text-blue-900">
                     <i class="fa-solid fa-circle-info text-blue-600"></i> Dica de Edição Rápida:
@@ -380,17 +296,16 @@
 
         </aside>
 
-        <!-- RIGHT FORMAL PRINTABLE REPORT SHEET -->
+        <!-- VISUALIZAÇÃO INTERATIVA DA TELA (INTERACTION & EDIT SCREEN) -->
         <main id="reportContainer" class="flex-1 w-full min-w-0">
             
-            <div id="printableArea" class="print-full-width bg-white p-6 sm:p-8 md:p-10 rounded-2xl shadow-sm border border-slate-200 text-slate-900 mx-auto min-h-[950px] flex flex-col justify-between transition-all">
+            <div id="printableArea" class="bg-white p-6 sm:p-8 md:p-10 rounded-2xl shadow-sm border border-slate-200 text-slate-900 mx-auto min-h-[950px] flex flex-col justify-between transition-all">
                 
                 <div>
-                    <!-- FORMAL REPORT HEADER -->
+                    <!-- CABEÇALHO INTERATIVO -->
                     <div class="border-b-2 border-slate-900 pb-5 mb-6">
-                        <div class="header-flex flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                             
-                            <!-- Left: Company Info -->
                             <div class="space-y-1 max-w-lg">
                                 <div class="flex items-center gap-2">
                                     <span class="text-[10px] font-bold uppercase tracking-widest bg-slate-100 text-slate-700 px-2 py-0.5 rounded">
@@ -398,7 +313,6 @@
                                     </span>
                                 </div>
 
-                                <!-- Inline Editable: Organization Name -->
                                 <div class="editable-field group flex items-center gap-2">
                                     <h1 id="dispOrgName" class="serif-title text-xl sm:text-2xl font-bold text-slate-900 tracking-tight leading-snug">
                                         Nome da Instituição / Empresa
@@ -408,7 +322,6 @@
                                     </button>
                                 </div>
 
-                                <!-- Inline Editable: CNPJ / ID -->
                                 <div class="editable-field group flex items-center gap-2 text-xs text-slate-600 font-medium">
                                     <span>CNPJ / Registro:</span>
                                     <span id="dispCnpj" class="font-semibold text-slate-800">00.000.000/0001-00</span>
@@ -418,13 +331,11 @@
                                 </div>
                             </div>
 
-                            <!-- Right: Report Title & Period -->
                             <div class="md:text-right border-l-4 md:border-l-0 md:border-r-4 border-blue-600 pl-3 md:pl-0 md:pr-3 py-0.5">
                                 <span class="inline-block font-bold text-xs uppercase tracking-wider text-slate-900 mb-0.5">
                                     RELATÓRIO DE FLUXO DE CAIXA
                                 </span>
                                 
-                                <!-- Inline Editable: Reference Period -->
                                 <div class="editable-field group flex items-center md:justify-end gap-1.5 text-xs text-slate-600">
                                     <span>Período:</span>
                                     <span id="dispPeriod" class="font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded">Setembro / 2026</span>
@@ -437,59 +348,45 @@
                         </div>
                     </div>
 
-                    <!-- FINANCIAL METRICS SUMMARY BANNER -->
-                    <div class="metrics-grid grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+                    <!-- CARDS DE RESUMO -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
                         
-                        <!-- Initial Balance (Editable) -->
-                        <div class="print-card bg-slate-50 p-3.5 rounded-xl border border-slate-200/90 relative editable-field group">
+                        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200/90 relative editable-field group">
                             <div class="flex items-center justify-between">
                                 <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Saldo Inicial</span>
                                 <button onclick="openEditModal('initialBalance')" class="edit-btn no-print text-slate-400 hover:text-blue-600 text-xs" title="Editar Saldo Inicial">
                                     <i class="fa-solid fa-pen"></i>
                                 </button>
                             </div>
-                            <span id="dispInitialBalance" class="text-base sm:text-lg font-extrabold text-slate-800 mt-1 block">
-                                R$ 0,00
-                            </span>
+                            <span id="dispInitialBalance" class="text-base sm:text-lg font-extrabold text-slate-800 mt-1 block">R$ 0,00</span>
                         </div>
 
-                        <!-- Total Income -->
-                        <div class="print-card bg-emerald-50/50 p-3.5 rounded-xl border border-emerald-200/80">
+                        <div class="bg-emerald-50/50 p-3.5 rounded-xl border border-emerald-200/80">
                             <span class="text-[10px] font-bold text-emerald-700 uppercase tracking-wider block">Total Entradas (+)</span>
-                            <span id="dispTotalIncome" class="text-base sm:text-lg font-extrabold text-emerald-700 mt-1 block income-text">
-                                R$ 0,00
-                            </span>
+                            <span id="dispTotalIncome" class="text-base sm:text-lg font-extrabold text-emerald-700 mt-1 block">R$ 0,00</span>
                         </div>
 
-                        <!-- Total Expenses -->
-                        <div class="print-card bg-rose-50/50 p-3.5 rounded-xl border border-rose-200/80">
+                        <div class="bg-rose-50/50 p-3.5 rounded-xl border border-rose-200/80">
                             <span class="text-[10px] font-bold text-rose-700 uppercase tracking-wider block">Total Saídas (-)</span>
-                            <span id="dispTotalExpenses" class="text-base sm:text-lg font-extrabold text-rose-700 mt-1 block expense-text">
-                                R$ 0,00
-                            </span>
+                            <span id="dispTotalExpenses" class="text-base sm:text-lg font-extrabold text-rose-700 mt-1 block">R$ 0,00</span>
                         </div>
 
-                        <!-- Final Balance -->
-                        <div class="print-card bg-blue-50/60 p-3.5 rounded-xl border border-blue-200">
+                        <div class="bg-blue-50/60 p-3.5 rounded-xl border border-blue-200">
                             <span class="text-[10px] font-bold text-blue-900 uppercase tracking-wider block">Saldo Final (=)</span>
-                            <span id="dispFinalBalance" class="text-base sm:text-lg font-extrabold text-blue-900 mt-1 block">
-                                R$ 0,00
-                            </span>
+                            <span id="dispFinalBalance" class="text-base sm:text-lg font-extrabold text-blue-900 mt-1 block">R$ 0,00</span>
                         </div>
 
                     </div>
 
-                    <!-- CATEGORY SUMMARY (SYNTHETIC BREAKDOWN) -->
+                    <!-- RESUMO POR CATEGORIA -->
                     <div id="categorySummaryWrapper" class="mb-6 hidden">
                         <h3 class="text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-2 flex items-center gap-1.5 border-b border-slate-200 pb-1">
                             <i class="fa-solid fa-chart-pie text-slate-400"></i> Resumo Sintético por Categoria
                         </h3>
-                        <div id="categorySummaryGrid" class="category-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 text-xs">
-                            <!-- Rendered dynamically -->
-                        </div>
+                        <div id="categorySummaryGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 text-xs"></div>
                     </div>
 
-                    <!-- ANALYTICAL ENTRIES TABLE -->
+                    <!-- TABELA PRINCIPAL DE LANÇAMENTOS -->
                     <div class="mb-6">
                         <div class="flex items-center justify-between mb-2">
                             <h3 class="text-[11px] font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
@@ -499,7 +396,7 @@
                         </div>
 
                         <div class="overflow-x-auto rounded-xl border border-slate-200">
-                            <table class="print-table w-full text-left text-xs border-collapse">
+                            <table class="w-full text-left text-xs border-collapse">
                                 <thead>
                                     <tr class="bg-slate-100 text-slate-800 font-bold border-b border-slate-300">
                                         <th class="py-2.5 px-3 w-24">Data</th>
@@ -508,19 +405,17 @@
                                         <th class="py-2.5 px-3 text-right w-28">Entrada (R$)</th>
                                         <th class="py-2.5 px-3 text-right w-28">Saída (R$)</th>
                                         <th class="py-2.5 px-3 text-right w-28">Saldo Acum.</th>
-                                        <th class="py-2.5 px-2 text-center w-12 action-col no-print">Ação</th>
+                                        <th class="py-2.5 px-2 text-center w-12 no-print">Ação</th>
                                     </tr>
                                 </thead>
-                                <tbody id="movementsTableBody" class="divide-y divide-slate-200">
-                                    <!-- Dynamic Rows -->
-                                </tbody>
+                                <tbody id="movementsTableBody" class="divide-y divide-slate-200"></tbody>
                                 <tfoot>
                                     <tr class="bg-slate-50 font-bold border-t-2 border-slate-900 text-slate-900">
                                         <td colspan="3" class="py-3 px-3 text-right uppercase tracking-wider text-[11px]">Totais Consolidados:</td>
-                                        <td id="tableTotalIncome" class="py-3 px-3 text-right text-emerald-700 font-extrabold income-text">R$ 0,00</td>
-                                        <td id="tableTotalExpenses" class="py-3 px-3 text-right text-rose-700 font-extrabold expense-text">R$ 0,00</td>
+                                        <td id="tableTotalIncome" class="py-3 px-3 text-right text-emerald-700 font-extrabold">R$ 0,00</td>
+                                        <td id="tableTotalExpenses" class="py-3 px-3 text-right text-rose-700 font-extrabold">R$ 0,00</td>
                                         <td id="tableFinalBalance" class="py-3 px-3 text-right text-blue-900 font-extrabold">R$ 0,00</td>
-                                        <td class="action-col no-print"></td>
+                                        <td class="no-print"></td>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -529,11 +424,10 @@
 
                 </div>
 
-                <!-- SIGNATURES & COMPLIANCE FOOTER -->
-                <div class="signature-block pt-6 border-t border-slate-300">
-                    <div class="signatures-grid grid grid-cols-1 sm:grid-cols-2 gap-8 text-center text-xs mb-6">
+                <!-- ASSINATURAS E RODAPÉ DA TELA -->
+                <div class="pt-6 border-t border-slate-300">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 text-center text-xs mb-6">
                         
-                        <!-- Responsible Signature (Editable) -->
                         <div class="editable-field group">
                             <div class="border-b border-slate-400 mb-2 mx-auto w-4/5"></div>
                             <div class="flex items-center justify-center gap-1.5">
@@ -545,7 +439,6 @@
                             <p class="text-[11px] text-slate-500 font-medium">Responsável Financeiro / Gestão</p>
                         </div>
 
-                        <!-- Board / Approval Signature (Editable) -->
                         <div class="editable-field group">
                             <div class="border-b border-slate-400 mb-2 mx-auto w-4/5"></div>
                             <div class="flex items-center justify-center gap-1.5">
@@ -571,7 +464,112 @@
 
     </div>
 
-    <!-- CUSTOM EDIT MODAL DIALOG -->
+    <!-- TEMPLATE OCULTO DEDICADO EXCLUSIVAMENTE À GERAÇÃO DO PDF -->
+    <div style="display: none;">
+        <div id="pdfReportTemplate" class="pdf-page-template">
+            <!-- Cabeçalho Formal PDF -->
+            <div style="border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 16px;">
+                <table style="border: none !important; margin: 0 !important;">
+                    <tr style="border: none !important;">
+                        <td style="border: none !important; padding: 0 !important; vertical-align: top;">
+                            <div style="font-size: 7pt; font-weight: 700; text-transform: uppercase; color: #475569; letter-spacing: 1px;">DEMONSTRATIVO FINANCEIRO OFICIAL</div>
+                            <div id="pdfOrgName" style="font-family: 'Merriweather', serif; font-size: 15pt; font-weight: 700; color: #0f172a; margin-top: 2px;">--</div>
+                            <div style="font-size: 8.5pt; color: #475569; margin-top: 2px;">CNPJ / Registro: <strong id="pdfCnpj" style="color: #0f172a;">--</strong></div>
+                        </td>
+                        <td style="border: none !important; padding: 0 !important; vertical-align: top; text-align: right; width: 220px;">
+                            <div style="font-size: 10pt; font-weight: 800; color: #0f172a; text-transform: uppercase; border-right: 3px solid #2563eb; padding-right: 8px;">FLUXO DE CAIXA</div>
+                            <div style="font-size: 8.5pt; color: #475569; margin-top: 4px; padding-right: 8px;">Período: <strong id="pdfPeriod" style="color: #0f172a;">--</strong></div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Cards Resumo PDF -->
+            <table style="margin-bottom: 16px !important; border: none !important;">
+                <tr style="border: none !important;">
+                    <td style="border: 1px solid #cbd5e1 !important; background: #f8fafc; padding: 8px !important; text-align: center; border-radius: 4px;">
+                        <div style="font-size: 7pt; font-weight: 700; text-transform: uppercase; color: #64748b;">Saldo Inicial</div>
+                        <div id="pdfInitialBalance" style="font-size: 10pt; font-weight: 800; color: #0f172a; margin-top: 2px;">R$ 0,00</div>
+                    </td>
+                    <td style="width: 10px; border: none !important;"></td>
+                    <td style="border: 1px solid #a7f3d0 !important; background: #f0fdf4; padding: 8px !important; text-align: center; border-radius: 4px;">
+                        <div style="font-size: 7pt; font-weight: 700; text-transform: uppercase; color: #166534;">Entradas (+)</div>
+                        <div id="pdfTotalIncome" style="font-size: 10pt; font-weight: 800; color: #15803d; margin-top: 2px;">R$ 0,00</div>
+                    </td>
+                    <td style="width: 10px; border: none !important;"></td>
+                    <td style="border: 1px solid #fecdd3 !important; background: #fff1f2; padding: 8px !important; text-align: center; border-radius: 4px;">
+                        <div style="font-size: 7pt; font-weight: 700; text-transform: uppercase; color: #991b1b;">Saídas (-)</div>
+                        <div id="pdfTotalExpenses" style="font-size: 10pt; font-weight: 800; color: #b91c1c; margin-top: 2px;">R$ 0,00</div>
+                    </td>
+                    <td style="width: 10px; border: none !important;"></td>
+                    <td style="border: 1px solid #bfdbfe !important; background: #eff6ff; padding: 8px !important; text-align: center; border-radius: 4px;">
+                        <div style="font-size: 7pt; font-weight: 700; text-transform: uppercase; color: #1e40af;">Saldo Final (=)</div>
+                        <div id="pdfFinalBalance" style="font-size: 10pt; font-weight: 800; color: #1e3a8a; margin-top: 2px;">R$ 0,00</div>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- Resumo Sintético por Categoria PDF -->
+            <div id="pdfCategorySummaryContainer" style="margin-bottom: 16px;">
+                <div style="font-size: 8pt; font-weight: 700; text-transform: uppercase; color: #475569; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; margin-bottom: 8px;">
+                    RESUMO SINTÉTICO POR CATEGORIA
+                </div>
+                <div id="pdfCategorySummaryGrid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;"></div>
+            </div>
+
+            <!-- Tabela Detalhada PDF -->
+            <div style="margin-bottom: 20px;">
+                <div style="font-size: 8pt; font-weight: 700; text-transform: uppercase; color: #475569; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; margin-bottom: 8px;">
+                    DETALHAMENTO ANALÍTICO DAS MOVIMENTAÇÕES
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 65px; text-align: left;">Data</th>
+                            <th style="text-align: left;">Descrição / Histórico</th>
+                            <th style="width: 110px; text-align: left;">Categoria</th>
+                            <th style="width: 75px; text-align: right;">Entrada</th>
+                            <th style="width: 75px; text-align: right;">Saída</th>
+                            <th style="width: 80px; text-align: right;">Saldo</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pdfMovementsBody"></tbody>
+                    <tfoot>
+                        <tr style="background-color: #f8fafc; font-weight: 800;">
+                            <td colspan="3" style="text-align: right; text-transform: uppercase; font-size: 8pt; padding: 6px;">Totais Consolidados:</td>
+                            <td id="pdfTableTotalIncome" style="text-align: right; color: #15803d; padding: 6px;">R$ 0,00</td>
+                            <td id="pdfTableTotalExpenses" style="text-align: right; color: #b91c1c; padding: 6px;">R$ 0,00</td>
+                            <td id="pdfTableFinalBalance" style="text-align: right; color: #1e3a8a; padding: 6px;">R$ 0,00</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <!-- Bloco de Assinaturas PDF -->
+            <div class="pdf-avoid-break" style="margin-top: 30px; padding-top: 15px; border-top: 1px solid #cbd5e1;">
+                <table style="border: none !important;">
+                    <tr style="border: none !important;">
+                        <td style="border: none !important; text-align: center; vertical-align: top; padding: 0 10px !important;">
+                            <div style="border-bottom: 1px solid #475569; width: 80%; margin: 0 auto 6px auto;"></div>
+                            <div id="pdfResponsible" style="font-weight: 700; font-size: 8.5pt; color: #0f172a;">--</div>
+                            <div style="font-size: 7.5pt; color: #64748b;">Responsável Financeiro / Gestão</div>
+                        </td>
+                        <td style="border: none !important; text-align: center; vertical-align: top; padding: 0 10px !important;">
+                            <div style="border-bottom: 1px solid #475569; width: 80%; margin: 0 auto 6px auto;"></div>
+                            <div id="pdfApprover" style="font-weight: 700; font-size: 8.5pt; color: #0f172a;">--</div>
+                            <div style="font-size: 7.5pt; color: #64748b;">Aprovação e Conformidade</div>
+                        </td>
+                    </tr>
+                </table>
+                <div style="margin-top: 20px; font-size: 7pt; color: #94a3b8; text-align: justify; display: flex; justify-content: space-between;">
+                    <span>Documento gerado para prestação de contas e transparência administrativa.</span>
+                    <span>Emissão em: <strong id="pdfTimestamp">--</strong></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE EDIÇÃO DE CAMPOS -->
     <div id="editModal" class="no-print fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden fade-in">
         <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-md w-full p-6 space-y-4">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -598,7 +596,7 @@
         </div>
     </div>
 
-    <!-- CUSTOM CONFIRMATION MODAL DIALOG (REPLACES NATIVE CONFIRM) -->
+    <!-- MODAL DE CONFIRMAÇÃO -->
     <div id="confirmModal" class="no-print fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden fade-in">
         <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-md w-full p-6 space-y-4">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -624,7 +622,7 @@
         </div>
     </div>
 
-    <!-- TOAST NOTIFICATION FOR MANUAL SAVE FEEDBACK -->
+    <!-- NOTIFICAÇÃO TOAST -->
     <div id="toastNotification" class="no-print fixed bottom-5 right-5 bg-emerald-600 text-white px-4 py-3 rounded-xl shadow-xl font-bold text-xs flex items-center gap-2 z-50 hidden transition-all duration-300 transform translate-y-2 opacity-0">
         <i class="fa-solid fa-circle-check text-sm"></i>
         <span id="toastMessage">Dados salvos com sucesso no LocalStorage!</span>
@@ -634,7 +632,6 @@
         const STORAGE_KEY = "FLUXO_CAIXA_APP_DATA_V2";
         const BACKUP_KEY = "FLUXO_CAIXA_APP_BACKUP_DATA";
 
-        // Predefined base categories split by operation type
         const DEFAULT_CATEGORIES = {
             entrada: [
                 "Vendas e Serviços",
@@ -654,7 +651,6 @@
             ]
         };
 
-        // Global Application State
         let state = {
             orgName: "Nome da sua Organização / Empresa",
             cnpj: "00.000.000/0001-00",
@@ -666,32 +662,20 @@
             activeEditKey: null
         };
 
-        // Window Initialization
         window.onload = function() {
-            // Set current month/year default period if empty
             const now = new Date();
             const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-            const currentPeriod = `${monthNames[now.getMonth()]} / ${now.getFullYear()}`;
-            
-            state.period = currentPeriod;
+            state.period = `${monthNames[now.getMonth()]} / ${now.getFullYear()}`;
 
-            // Load data from LocalStorage if present
             loadStateFromLocalStorage();
-
-            // Check if a backup exists to toggle the restore button
             checkBackupStatus();
 
-            // Default form date
             const entryDateInput = document.getElementById('entryDate');
             if (entryDateInput) entryDateInput.valueAsDate = now;
             
-            // Set current print timestamp
             updateTimestamp();
-
-            // Initial Render
             renderApp();
             
-            // Close dropdown when clicking outside
             document.addEventListener('click', function(e) {
                 const dropdown = document.getElementById('menuDropdown');
                 const btn = document.getElementById('menuDropdownBtn');
@@ -702,45 +686,40 @@
         };
 
         function updateTimestamp() {
-            const el = document.getElementById('currentTimestamp');
-            if (!el) return;
             const now = new Date();
             const formatted = now.toLocaleDateString('pt-BR', {
                 day: '2-digit', month: '2-digit', year: 'numeric',
                 hour: '2-digit', minute: '2-digit'
             });
-            el.textContent = formatted;
+            
+            const elScreen = document.getElementById('currentTimestamp');
+            if (elScreen) elScreen.textContent = formatted;
+
+            const elPdf = document.getElementById('pdfTimestamp');
+            if (elPdf) elPdf.textContent = formatted;
         }
 
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebarPanel');
-            if (sidebar) {
-                sidebar.classList.toggle('hidden');
-            }
+            if (sidebar) sidebar.classList.toggle('hidden');
         }
 
         function toggleMenuDropdown(e) {
             if (e) e.stopPropagation();
             const dropdown = document.getElementById('menuDropdown');
-            if (dropdown) {
-                dropdown.classList.toggle('hidden');
-            }
+            if (dropdown) dropdown.classList.toggle('hidden');
         }
 
         function closeMenuDropdown() {
             const dropdown = document.getElementById('menuDropdown');
-            if (dropdown) {
-                dropdown.classList.add('hidden');
-            }
+            if (dropdown) dropdown.classList.add('hidden');
         }
 
-        // Fast Category Picker function from click chips
         function selectCategory(categoryName) {
             const input = document.getElementById('entryCategory');
             if (input) {
                 input.value = categoryName;
                 delete input.dataset.autoSuggested;
-                // Auto focus value field for faster data entry
                 const valInput = document.getElementById('entryValue');
                 if (valInput) valInput.focus();
             }
@@ -751,12 +730,10 @@
             return radio ? radio.value : 'entrada';
         }
 
-        // Triggered when toggling between "Entrada (+)" and "Saída (-)"
         function handleTypeChange() {
             const categoryInput = document.getElementById('entryCategory');
             const currentType = getSelectedType();
 
-            // Clear category if it was auto-suggested or doesn't belong to the newly selected operation type
             if (categoryInput) {
                 const currentVal = categoryInput.value.trim();
                 const defaults = DEFAULT_CATEGORIES[currentType] || [];
@@ -774,14 +751,12 @@
             
             updateCategorySuggestions();
             
-            // Re-evaluate description prediction if text is already typed
             const descInput = document.getElementById('entryDesc');
             if (descInput && descInput.value) {
                 handleDescInput(descInput.value);
             }
         }
 
-        // Filter and display category suggestion chips in real-time according to selected Type
         function filterCategorySuggestions(query = '') {
             const quickContainer = document.getElementById('quickCategories');
             const titleEl = document.getElementById('quickCatTitle');
@@ -790,7 +765,6 @@
             const currentType = getSelectedType();
             const defaults = DEFAULT_CATEGORIES[currentType] || DEFAULT_CATEGORIES.entrada;
 
-            // Calculate frequency of used categories from history for the SELECTED type ONLY
             const freqMap = {};
             state.movements.forEach(m => {
                 if (m.type === currentType && m.category) {
@@ -798,7 +772,6 @@
                 }
             });
 
-            // Combine default and user registered categories for this operation type
             const allCategoriesSet = new Set([...defaults, ...Object.keys(freqMap)]);
             let categoriesList = Array.from(allCategoriesSet);
 
@@ -846,7 +819,6 @@
             }).join('');
         }
 
-        // Auto-predict category filtered by selected operation type
         function handleDescInput(descText) {
             if (!descText || descText.trim().length < 2) return;
             const categoryInput = document.getElementById('entryCategory');
@@ -870,7 +842,6 @@
             }
         }
 
-        // Dynamically update Datalist & Quick Suggestion Chips based on current type selection
         function updateCategorySuggestions() {
             const datalist = document.getElementById('categoriesList');
             if (!datalist) return;
@@ -888,12 +859,10 @@
             const allCategoriesSet = new Set([...defaults, ...Object.keys(freqMap)]);
             const allCategories = Array.from(allCategoriesSet);
 
-            // Populate Datalist Autocomplete Options for current type
             datalist.innerHTML = allCategories
                 .map(cat => `<option value="${cat}">`)
                 .join('');
 
-            // Update visible suggestion chips
             const catInput = document.getElementById('entryCategory');
             filterCategorySuggestions(catInput ? catInput.value : '');
         }
@@ -909,7 +878,6 @@
             return dateStr;
         }
 
-        // Save state to LocalStorage
         function saveStateToLocalStorage() {
             try {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -918,7 +886,6 @@
             }
         }
 
-        // Load state from LocalStorage
         function loadStateFromLocalStorage() {
             try {
                 const saved = localStorage.getItem(STORAGE_KEY);
@@ -997,7 +964,6 @@
                 state[key] = input.value.trim();
             }
 
-            // Removido salvamento automático para atender requisição de salvamento manual apenas
             closeEditModal();
             renderApp();
         }
@@ -1024,10 +990,8 @@
             };
 
             state.movements.push(newEntry);
-            // Removido salvamento automático
             renderApp();
 
-            // Clear form inputs
             document.getElementById('entryDesc').value = '';
             categoryInput.value = '';
             delete categoryInput.dataset.autoSuggested;
@@ -1036,11 +1000,9 @@
 
         function deleteEntry(id) {
             state.movements = state.movements.filter(m => m.id !== id);
-            // Removido salvamento automático
             renderApp();
         }
 
-        // Ação manual acionada pelo menu de opções
         function saveManualToLocalStorage() {
             saveStateToLocalStorage();
             showToast("Alterações salvas no LocalStorage com sucesso!");
@@ -1066,81 +1028,147 @@
             }, 3000);
         }
 
-        // Generate PDF directly via html2pdf.js using an off-screen A4 container
+        /* ATUALIZA E EXPORTA O PDF USANDO O TEMPLATE SEPARADO E EXCLUSIVO */
         function generatePDF() {
             const btn = document.getElementById('pdfBtn');
-            const originalElement = document.getElementById('printableArea');
-            if (!originalElement) return;
-
             const originalBtnText = btn.innerHTML;
+            
             btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-sm"></i> <span class="hidden sm:inline">Gerando PDF...</span>`;
             btn.disabled = true;
 
-            // Create off-screen container rendered at standard A4 pixel width
-            const tempContainer = document.createElement('div');
-            tempContainer.style.position = 'absolute';
-            tempContainer.style.left = '-9999px';
-            tempContainer.style.top = '0';
-            tempContainer.style.width = '794px';
-            tempContainer.style.backgroundColor = '#ffffff';
+            // Preenche o template oculto com os dados atuais
+            updatePdfTemplateData();
 
-            // Deep clone printable area
-            const clone = originalElement.cloneNode(true);
-            clone.id = 'printableAreaClone';
+            const element = document.getElementById('pdfReportTemplate');
 
-            // Remove non-printable elements and action columns from clone
-            const noPrints = clone.querySelectorAll('.no-print, .edit-btn, .action-col');
-            noPrints.forEach(el => el.remove());
-
-            tempContainer.appendChild(clone);
-            document.body.appendChild(tempContainer);
-
-            // Configure html2pdf options
             const opt = {
-                margin:       [8, 8, 8, 8],
+                margin:       [10, 10, 10, 10],
                 filename:     `Relatorio_Fluxo_de_Caixa_${(state.period || 'Financeiro').replace(/[^a-zA-Z0-9]/g, '_')}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { 
                     scale: 2, 
                     useCORS: true, 
-                    logging: false,
-                    width: 794,
-                    windowWidth: 794,
-                    scrollX: 0,
-                    scrollY: 0
+                    logging: false
                 },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
             };
 
             setTimeout(() => {
                 if (typeof html2pdf !== 'undefined') {
-                    html2pdf().set(opt).from(clone).save().then(() => {
-                        if (document.body.contains(tempContainer)) {
-                            document.body.removeChild(tempContainer);
-                        }
+                    html2pdf().set(opt).from(element).save().then(() => {
                         btn.innerHTML = originalBtnText;
                         btn.disabled = false;
                     }).catch(err => {
-                        console.warn("Falha no html2pdf, acionando impressão padrão:", err);
-                        if (document.body.contains(tempContainer)) {
-                            document.body.removeChild(tempContainer);
-                        }
+                        console.warn("Falha no html2pdf, acionando impressão nativa:", err);
                         btn.innerHTML = originalBtnText;
                         btn.disabled = false;
                         window.print();
                     });
                 } else {
-                    if (document.body.contains(tempContainer)) {
-                        document.body.removeChild(tempContainer);
-                    }
                     btn.innerHTML = originalBtnText;
                     btn.disabled = false;
                     window.print();
                 }
-            }, 200);
+            }, 250);
         }
 
-        // Sample Data Preset Loader with automatic backup of current user work
+        /* ALIMENTA O TEMPLATE EXCLUSIVO DO PDF */
+        function updatePdfTemplateData() {
+            updateTimestamp();
+
+            document.getElementById('pdfOrgName').textContent = state.orgName || "Nome da sua Organização / Empresa";
+            document.getElementById('pdfCnpj').textContent = state.cnpj || "00.000.000/0001-00";
+            document.getElementById('pdfPeriod').textContent = state.period || "";
+            document.getElementById('pdfResponsible').textContent = state.responsible || "";
+            document.getElementById('pdfApprover').textContent = state.approver || "";
+            document.getElementById('pdfInitialBalance').textContent = formatCurrency(state.initialBalance);
+
+            let totalIncome = 0;
+            let totalExpenses = 0;
+
+            state.movements.forEach(m => {
+                if (m.type === 'entrada') totalIncome += m.value;
+                if (m.type === 'saida') totalExpenses += m.value;
+            });
+
+            const finalBalance = state.initialBalance + totalIncome - totalExpenses;
+
+            document.getElementById('pdfTotalIncome').textContent = formatCurrency(totalIncome);
+            document.getElementById('pdfTotalExpenses').textContent = formatCurrency(totalExpenses);
+            document.getElementById('pdfFinalBalance').textContent = formatCurrency(finalBalance);
+
+            document.getElementById('pdfTableTotalIncome').textContent = formatCurrency(totalIncome);
+            document.getElementById('pdfTableTotalExpenses').textContent = formatCurrency(totalExpenses);
+            document.getElementById('pdfTableFinalBalance').textContent = formatCurrency(finalBalance);
+
+            // Resumo Sintético PDF
+            const pdfCatContainer = document.getElementById('pdfCategorySummaryContainer');
+            const pdfCatGrid = document.getElementById('pdfCategorySummaryGrid');
+
+            if (state.movements.length === 0) {
+                pdfCatContainer.style.display = 'none';
+            } else {
+                pdfCatContainer.style.display = 'block';
+                pdfCatGrid.innerHTML = '';
+
+                const categories = {};
+                state.movements.forEach(m => {
+                    if (!categories[m.category]) {
+                        categories[m.category] = { entrada: 0, saida: 0 };
+                    }
+                    if (m.type === 'entrada') categories[m.category].entrada += m.value;
+                    if (m.type === 'saida') categories[m.category].saida += m.value;
+                });
+
+                Object.keys(categories).forEach(cat => {
+                    const data = categories[cat];
+                    const item = document.createElement('div');
+                    item.style.cssText = "background: #f8fafc; border: 1px solid #e2e8f0; padding: 6px; border-radius: 4px;";
+
+                    let html = `<div style="font-weight: 700; font-size: 8pt; color: #1e293b; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${cat}</div>`;
+                    if (data.entrada > 0) {
+                        html += `<div style="font-size: 7.5pt; color: #15803d; font-weight: 700;">+ ${formatCurrency(data.entrada)}</div>`;
+                    }
+                    if (data.saida > 0) {
+                        html += `<div style="font-size: 7.5pt; color: #b91c1c; font-weight: 700;">- ${formatCurrency(data.saida)}</div>`;
+                    }
+                    item.innerHTML = html;
+                    pdfCatGrid.appendChild(item);
+                });
+            }
+
+            // Tabela do PDF
+            const pdfTbody = document.getElementById('pdfMovementsBody');
+            pdfTbody.innerHTML = '';
+
+            if (state.movements.length === 0) {
+                pdfTbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: #94a3b8; padding: 15px;">Nenhuma movimentação lançada.</td>
+                    </tr>
+                `;
+            } else {
+                let runningBalance = state.initialBalance;
+
+                state.movements.forEach(m => {
+                    if (m.type === 'entrada') runningBalance += m.value;
+                    if (m.type === 'saida') runningBalance -= m.value;
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="font-weight: 600; color: #334155;">${formatDate(m.date)}</td>
+                        <td style="color: #0f172a;">${m.desc}</td>
+                        <td style="color: #475569;"><span style="background: #f1f5f9; padding: 2px 4px; border-radius: 3px; font-size: 7.5pt;">${m.category}</span></td>
+                        <td style="text-align: right; font-weight: 700; color: #15803d;">${m.type === 'entrada' ? formatCurrency(m.value) : '-'}</td>
+                        <td style="text-align: right; font-weight: 700; color: #b91c1c;">${m.type === 'saida' ? formatCurrency(m.value) : '-'}</td>
+                        <td style="text-align: right; font-weight: 800; color: ${runningBalance >= 0 ? '#0f172a' : '#b91c1c'};">${formatCurrency(runningBalance)}</td>
+                    `;
+                    pdfTbody.appendChild(tr);
+                });
+            }
+        }
+
         function loadSampleData() {
             const executeLoad = () => {
                 try {
@@ -1187,7 +1215,6 @@
             }
         }
 
-        // Restore backup data saved before sample loading
         function restoreBackupData() {
             try {
                 const backup = localStorage.getItem(BACKUP_KEY);
@@ -1203,7 +1230,6 @@
             }
         }
 
-        // Custom Confirmation Modal Helpers
         let pendingConfirmCallback = null;
 
         function showConfirmModal(title, message, confirmBtnText, confirmBtnClass, callback) {
@@ -1234,7 +1260,6 @@
             pendingConfirmCallback = null;
         }
 
-        // Clear state & LocalStorage
         function confirmClearAll() {
             showConfirmModal(
                 "Limpar Dados / Resetar",
@@ -1262,8 +1287,8 @@
             );
         }
 
+        /* RENDERIZAÇÃO DA INTERFACE VISUAL DA TELA */
         function renderApp() {
-            // Header & Info fields
             document.getElementById('dispOrgName').textContent = state.orgName || "Nome da sua Organização / Empresa";
             document.getElementById('dispCnpj').textContent = state.cnpj || "00.000.000/0001-00";
             document.getElementById('dispPeriod').textContent = state.period || "";
@@ -1271,10 +1296,8 @@
             document.getElementById('dispApprover').textContent = state.approver || "";
             document.getElementById('dispInitialBalance').textContent = formatCurrency(state.initialBalance);
 
-            // Sort movements by date
             state.movements.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-            // Calculate Totals
             let totalIncome = 0;
             let totalExpenses = 0;
 
@@ -1285,7 +1308,6 @@
 
             const finalBalance = state.initialBalance + totalIncome - totalExpenses;
 
-            // Display Totals
             document.getElementById('dispTotalIncome').textContent = formatCurrency(totalIncome);
             document.getElementById('dispTotalExpenses').textContent = formatCurrency(totalExpenses);
             document.getElementById('dispFinalBalance').textContent = formatCurrency(finalBalance);
@@ -1296,14 +1318,13 @@
 
             document.getElementById('entryCountLabel').textContent = `${state.movements.length} lançamento(s)`;
 
-            // Render Table Rows & Compute Running Balance
             const tbody = document.getElementById('movementsTableBody');
             tbody.innerHTML = '';
 
             if (state.movements.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="6" class="py-8 text-center text-slate-400 font-medium">
+                        <td colspan="7" class="py-8 text-center text-slate-400 font-medium">
                             <i class="fa-solid fa-folder-open text-2xl mb-2 block text-slate-300"></i>
                             Nenhuma movimentação cadastrada. Use o formulário lateral para adicionar lançamentos.
                         </td>
@@ -1323,10 +1344,10 @@
                         <td class="py-2.5 px-3 font-semibold text-slate-700 whitespace-nowrap">${formatDate(m.date)}</td>
                         <td class="py-2.5 px-3 text-slate-800 font-medium">${m.desc}</td>
                         <td class="py-2.5 px-3 text-slate-600"><span class="bg-slate-100 px-2 py-0.5 rounded text-[11px] font-semibold">${m.category}</span></td>
-                        <td class="py-2.5 px-3 text-right font-bold text-emerald-700 income-text">${m.type === 'entrada' ? formatCurrency(m.value) : '-'}</td>
-                        <td class="py-2.5 px-3 text-right font-bold text-rose-700 expense-text">${m.type === 'saida' ? formatCurrency(m.value) : '-'}</td>
+                        <td class="py-2.5 px-3 text-right font-bold text-emerald-700">${m.type === 'entrada' ? formatCurrency(m.value) : '-'}</td>
+                        <td class="py-2.5 px-3 text-right font-bold text-rose-700">${m.type === 'saida' ? formatCurrency(m.value) : '-'}</td>
                         <td class="py-2.5 px-3 text-right font-extrabold ${runningBalance >= 0 ? 'text-slate-900' : 'text-rose-700'}">${formatCurrency(runningBalance)}</td>
-                        <td class="py-2.5 px-2 text-center action-col no-print">
+                        <td class="py-2.5 px-2 text-center no-print">
                             <button onclick="deleteEntry(${m.id})" class="text-slate-400 hover:text-rose-600 p-1 rounded transition" title="Excluir Lançamento">
                                 <i class="fa-solid fa-trash-can"></i>
                             </button>
@@ -1336,10 +1357,7 @@
                 });
             }
 
-            // Category Summary Breakdown
             renderCategorySummary();
-
-            // Update Dynamic Autocomplete & Quick Pills for Category Selection
             updateCategorySuggestions();
         }
 
