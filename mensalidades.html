@@ -58,33 +58,35 @@
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
 
-    <!-- Header Principal -->
-    <header class="bg-indigo-900 text-white shadow-md no-print">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap justify-between items-center gap-4">
+    <!-- Header Principal (Ajustado para Responsividade) -->
+    <header class="bg-indigo-900 text-white shadow-md no-print relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4">
             <div class="flex items-center space-x-3">
                 <!-- Ícone / Logo de Chapéu de Formatura -->
-                <div class="bg-indigo-800/80 p-2.5 rounded-xl shadow-inner flex items-center justify-center border border-indigo-700/50">
-                    <i class="fa-solid fa-graduation-cap text-3xl text-indigo-200"></i>
+                <div class="bg-indigo-800/80 p-2.5 rounded-xl shadow-inner flex items-center justify-center border border-indigo-700/50 flex-shrink-0">
+                    <i class="fa-solid fa-graduation-cap text-2xl sm:text-3xl text-indigo-200"></i>
                 </div>
-                <div>
-                    <h1 class="text-xl font-extrabold tracking-tight flex items-center gap-2">
-                        Formatura AFV 2026
+                <div class="min-w-0">
+                    <h1 class="text-lg sm:text-xl font-extrabold tracking-tight flex flex-wrap items-center gap-2">
+                        <span>Formatura AFV 2026</span>
                         <span class="text-[10px] bg-indigo-700 text-indigo-100 font-semibold px-2 py-0.5 rounded-full uppercase">Fluxo de Caixa</span>
                     </h1>
-                    <p class="text-xs text-indigo-200">Gestão de Parcelas (Março a Dezembro • 10x R$40)</p>
+                    <p class="text-xs text-indigo-200 truncate">Gestão de Parcelas (Março a Dezembro • 10x R$40)</p>
                 </div>
             </div>
             
             <!-- Menu de Ações Recolhível Organizado -->
-            <div class="relative inline-block text-left">
-                <button id="btnMenuAcoes" onclick="toggleMenuAcoes()" class="bg-indigo-800 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center shadow-md transition border border-indigo-700">
-                    <i class="fa-solid fa-bars-staggered mr-2 text-indigo-300"></i>
-                    <span>Menu de Opções</span>
+            <div class="relative w-full sm:w-auto text-left">
+                <button id="btnMenuAcoes" onclick="toggleMenuAcoes()" class="w-full sm:w-auto bg-indigo-800 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center justify-between sm:justify-start shadow-md transition border border-indigo-700">
+                    <span class="flex items-center">
+                        <i class="fa-solid fa-bars-staggered mr-2 text-indigo-300"></i>
+                        <span>Menu de Opções</span>
+                    </span>
                     <i class="fa-solid fa-chevron-down ml-2 text-xs text-indigo-300 transition-transform" id="setaMenuAcoes"></i>
                 </button>
 
-                <!-- Dropdown de Opções Reorganizado -->
-                <div id="dropdownAcoes" class="hidden absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-2xl py-2 z-50 text-slate-800 border border-slate-200 divide-y divide-slate-100 transform transition-all">
+                <!-- Dropdown de Opções Reorganizado e Ajustado para Telas Pequenas -->
+                <div id="dropdownAcoes" class="hidden absolute right-0 mt-2 w-full sm:w-72 max-w-[calc(100vw-2rem)] bg-white rounded-xl shadow-2xl py-2 z-50 text-slate-800 border border-slate-200 divide-y divide-slate-100 transform transition-all">
                     <!-- Bloco 1: Ações Principais / Salvamento -->
                     <div class="py-1">
                         <button onclick="salvarDadosComAlerta(); fecharMenuAcoes();" class="w-full text-left px-4 py-2.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-50 flex items-center">
