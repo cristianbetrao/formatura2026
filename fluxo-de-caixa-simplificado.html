@@ -932,12 +932,10 @@
             if (title && title.querySelector('span')) title.querySelector('span').textContent = config.title;
             if (label) label.textContent = config.label;
 
+            input.type = 'text';
             if (key === 'initialBalance') {
-                input.type = 'number';
-                input.step = '0.01';
-                input.value = state.initialBalance || 0;
+                input.value = (state.initialBalance || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             } else {
-                input.type = 'text';
                 input.value = state[key] || '';
             }
 
@@ -959,7 +957,8 @@
             if (!input) return;
 
             if (key === 'initialBalance') {
-                state.initialBalance = parseFloat(input.value) || 0;
+                let cleanVal = input.value.replace(/[^\d,.-]/g, '').replace(/\./g, '').replace(',', '.');
+                state.initialBalance = parseFloat(cleanVal) || 0;
             } else {
                 state[key] = input.value.trim();
             }
@@ -1028,7 +1027,7 @@
             }, 3000);
         }
 
-        /* ATUALIZA E EXPORTA O PDF USANDO O TEMPLATE SEPARADO E EXCLUSIVO */
+        /* ATUALIZA E EXPORTA O PDF USANDO O TEMPLATE SEPARADO E EXCLUSIVAMENTE */
         function generatePDF() {
             const btn = document.getElementById('pdfBtn');
             const originalBtnText = btn.innerHTML;
@@ -1083,6 +1082,9 @@
             document.getElementById('pdfResponsible').textContent = state.responsible || "";
             document.getElementById('pdfApprover').textContent = state.approver || "";
             document.getElementById('pdfInitialBalance').textContent = formatCurrency(state.initialBalance);
+
+            // Garante ordenação cronológica antes de preencher o PDF
+            state.movements.sort((a, b) => new Date(a.date) - new Date(b.date));
 
             let totalIncome = 0;
             let totalExpenses = 0;
@@ -1296,6 +1298,7 @@
             document.getElementById('dispApprover').textContent = state.approver || "";
             document.getElementById('dispInitialBalance').textContent = formatCurrency(state.initialBalance);
 
+            // Ordena os lançamentos por data (ordem cronológica crescente)
             state.movements.sort((a, b) => new Date(a.date) - new Date(b.date));
 
             let totalIncome = 0;
